@@ -31,8 +31,8 @@ module graphic # (
     logic signed [ 9:0] v_ball_pos_diff;
     logic        [21:0] ball_dist_squared;
 
-    assign h_ball_pos_diff = $signed(i_h_coord) - $signed(i_screen_ball_x);
-    assign v_ball_pos_diff = $signed(i_v_coord) - $signed(i_screen_ball_y);
+    assign h_ball_pos_diff = signed'(i_h_coord) - signed'(i_screen_ball_x);
+    assign v_ball_pos_diff = signed'(i_v_coord) - signed'(i_screen_ball_y);
 
     assign ball_dist_squared = h_ball_pos_diff * h_ball_pos_diff + 
                                v_ball_pos_diff * v_ball_pos_diff;
