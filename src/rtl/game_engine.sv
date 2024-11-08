@@ -1,6 +1,6 @@
 module game_engine # (
-    localparam SCREEN_WIDTH  = 800,
-    localparam SCREEN_HEIGHT = 600
+    parameter SCREEN_WIDTH  = 800,
+    parameter SCREEN_HEIGHT = 600
 )(
     input  logic                             clk,
     input  logic                             arst_n,
@@ -29,6 +29,6 @@ module game_engine # (
     output logic                      [31:0] o_disp_data
 );
 
-// TODO
+
 
 endmodule

@@ -1,12 +1,12 @@
 module graphic # (
-    localparam SCREEN_WIDTH   = 800,
-    localparam SCREEN_HEIGHT  = 600,
-    localparam BALL_RADIUS    = 20,
-    localparam BALL_RADIUS_SQ = BALL_RADIUS * BALL_RADIUS,
+    parameter SCREEN_WIDTH   = 800,
+    parameter SCREEN_HEIGHT  = 600,
+    parameter BALL_RADIUS    = 20,
+    parameter BALL_RADIUS_SQ = BALL_RADIUS * BALL_RADIUS,
 
-    localparam [11:0] BALL_COLOR = 12'hF00,  // Red
-    localparam [11:0] SAFE_COLOR = 12'h0F0,  // Green
-    localparam [11:0] BKG_COLOR  = 12'h00F   // Blue
+    parameter [11:0] BALL_COLOR = 12'hF00,  // Red
+    parameter [11:0] SAFE_COLOR = 12'h0F0,  // Green
+    parameter [11:0] BKG_COLOR  = 12'h00F   // Blue
 ) (
     output logic [$clog2(SCREEN_WIDTH )-1:0] o_screen_x,
     output logic [$clog2(SCREEN_HEIGHT)-1:0] o_screen_y,
@@ -34,7 +34,7 @@ module graphic # (
     assign h_ball_pos_diff = signed'(i_h_coord) - signed'(i_screen_ball_x);
     assign v_ball_pos_diff = signed'(i_v_coord) - signed'(i_screen_ball_y);
 
-    assign ball_dist_squared = h_ball_pos_diff * h_ball_pos_diff + 
+    assign ball_dist_squared = h_ball_pos_diff * h_ball_pos_diff +
                                v_ball_pos_diff * v_ball_pos_diff;
 
     always_comb begin
