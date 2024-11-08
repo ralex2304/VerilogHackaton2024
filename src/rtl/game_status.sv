@@ -15,15 +15,16 @@ module game_status # (
     input logic                                 rst_n           ,  
 
     // safe zone (?)
-    input logic                                 i_is_win        ,
-    input logic                                 i_round_ended   ,
+    input logic                                 i_is_win        , // is round win or lose
+    input logic                                 i_round_ended   , // is round ended
+    input logic                                 i_ready         , // is safe zone end generation
 
     // button
     input logic                                 i_pause_game    ,  
     output logic                                o_is_game_paused,    
 
     output logic    [RATING_WIDTH - 1 : 0]      o_current_rating,
-    output logic    [GAME_STATE_WIDTH - 1 : 0]  o_game_status   ,
+    output logic    [GAME_STATE_WIDTH - 1 : 0]  o_game_status   
 );
 
 // rating
@@ -43,9 +44,9 @@ end
 assign o_current_rating = rating_count;
 
 // game state
-
 typedef enum bit[GAME_STATE_WIDTH - 1 : 0] {
     LEVEL_GENERATING = 2'b00,
+
     LEVEL_RUNNING    = 2'b01,
     GAME_OVER        = 2'b10
 } game_state;
@@ -61,6 +62,10 @@ always @ (posedge clk or negedge rst_n) begin
             if (i_round_ended) begin
                 gstate <= i_is_win ? LEVEL_GENERATING
                                    : GAME_OVER;
+            end
+
+            if (i_ready) begin
+                gstate <= LEVEL_RUNNING;
             end
         end
     end
