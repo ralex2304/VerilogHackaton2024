@@ -28,8 +28,8 @@ logic subgen, subgen_finished;
 logic [SUB_SIZE-1:0][SUB_SIZE-1:0] subarray;
 logic [$clog2(SUB_SIZE)-1:0] subx, suby;
 
-assign gen_finished    = (x == ($clog2(SUBARRAYS_X_NUM))'(SUBARRAYS_X_NUM) &&
-                          y == ($clog2(SUBARRAYS_Y_NUM))'(SUBARRAYS_Y_NUM));
+assign gen_finished    = (x == ($clog2(SUBARRAYS_X_NUM))'(SUBARRAYS_X_NUM - 1) &&
+                          y == ($clog2(SUBARRAYS_Y_NUM))'(SUBARRAYS_Y_NUM - 1));
 assign subgen_finished = (subx == SUB_SIZE && suby == SUB_SIZE);
 
 assign o_rdy = ~gen;
@@ -48,8 +48,8 @@ always_ff @(posedge clk) begin
         x   <= '0;
         y   <= '0;
     end else if (subgen_finished) begin
-        y   <= y + ($clog2(SUBARRAYS_Y_NUM))'(x == ($clog2(SUBARRAYS_X_NUM))'(SUBARRAYS_X_NUM));
-        x   <= (x == ($clog2(SUBARRAYS_X_NUM))'(SUBARRAYS_X_NUM)) ? '0 : (x + 1);
+        y   <= y + ($clog2(SUBARRAYS_Y_NUM))'(x == ($clog2(SUBARRAYS_X_NUM))'(SUBARRAYS_X_NUM - 1));
+        x   <= (x == ($clog2(SUBARRAYS_X_NUM))'(SUBARRAYS_X_NUM - 1)) ? '0 : (x + 1);
     end
 end
 
