@@ -9,7 +9,6 @@ module graphic # (
 ) (
     output logic [$clog2(SCREEN_WIDTH )-1:0] o_screen_x,
     output logic [$clog2(SCREEN_HEIGHT)-1:0] o_screen_y,
-    output logic                             o_is_pixel_valid,
 
     input  logic                             i_is_safe,
 
@@ -50,8 +49,6 @@ module graphic # (
         end else begin
             {o_red, o_green, o_blue} = BKG_COLOR;
         end
-
-        o_is_pixel_valid = i_disp_enbl && (i_h_coord < SCREEN_WIDTH) && (i_v_coord < SCREEN_HEIGHT);
 
         o_screen_x = i_h_coord[$clog2(SCREEN_WIDTH )-1:0];
         o_screen_y = i_v_coord[$clog2(SCREEN_HEIGHT)-1:0];

@@ -1,7 +1,7 @@
 module safe_zone # (
-    localparam SCREEN_WIDTH  = 800,
-    localparam SCREEN_HEIGHT = 600,
-    localparam BLOCK_SIZE    = 10
+    parameter SCREEN_WIDTH  = 800,
+    parameter SCREEN_HEIGHT = 600,
+    parameter BLOCK_SIZE    = 10
 )(
     input  logic                             clk,
     input  logic                             arst_n,

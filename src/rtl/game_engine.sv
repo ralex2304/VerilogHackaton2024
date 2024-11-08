@@ -29,6 +29,35 @@ module game_engine # (
     output logic                      [31:0] o_disp_data
 );
 
+safe_zone # (
+    .SCREEN_WIDTH  (SCREEN_WIDTH),
+    .SCREEN_HEIGHT (SCREEN_HEIGHT),
+    .BLOCK_SIZE    (10)
+) safe_zone_inst (
+    .clk                (clk),
+    .arst_n             (arst_n),
 
+    .i_regenerate_level (i_btn_up), // FIXME
+    .o_rdy              (),
+
+    .i_x                (i_screen_x), // TODO
+    .i_y                (i_screen_y),
+    .o_is_safe          (o_is_safe)
+);
+
+ball_positioner # (
+    .SCREEN_WIDTH  (800),
+    .SCREEN_HEIGHT (600),
+    .BALL_RADIUS   (20)
+) ball_positioner_inst (
+    .clk        (clk),
+    .arst_n     (arst_n),
+
+    .i_accel_x  (i_accel_dx),
+    .i_accel_y  (i_accel_dy),
+
+    .o_ball_x   (o_screen_ball_x),
+    .o_ball_y   (o_screen_ball_y)
+);
 
 endmodule
