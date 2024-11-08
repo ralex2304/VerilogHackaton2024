@@ -2,7 +2,6 @@ module graphic # (
     parameter SCREEN_WIDTH   = 800,
     parameter SCREEN_HEIGHT  = 600,
     parameter BALL_RADIUS    = 20,
-    parameter BALL_RADIUS_SQ = BALL_RADIUS * BALL_RADIUS,
 
     parameter [11:0] BALL_COLOR = 12'hF00,  // Red
     parameter [11:0] SAFE_COLOR = 12'h0F0,  // Green
@@ -26,6 +25,8 @@ module graphic # (
     input logic                       [10:0] i_h_coord,    // horizontal pixel coordinate
     input logic                       [ 9:0] i_v_coord
 );
+
+    localparam BALL_RADIUS_SQ = BALL_RADIUS * BALL_RADIUS;
 
     logic signed [10:0] h_ball_pos_diff;
     logic signed [ 9:0] v_ball_pos_diff;
