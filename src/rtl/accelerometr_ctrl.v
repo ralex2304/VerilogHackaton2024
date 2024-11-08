@@ -14,7 +14,7 @@ module accelerometr_ctrl (
     output            ACL_MOSI
 );
 
-    spi_ctrl (
+    spi_ctrl spi (
       .rst_n        ( arst_n       ),
       .clk_5mhz0d   ( spi_clk      ),
       .clk_5mhz180d ( spi_clk_out  ),
