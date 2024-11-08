@@ -1,5 +1,5 @@
 module graphic # (
-    parameter SCREEN_WIDTH   = 800,
+    parameter SCREEN_WIDTH   = 400,
     parameter SCREEN_HEIGHT  = 600,
     parameter BALL_RADIUS    = 10,
 
@@ -27,12 +27,12 @@ module graphic # (
 
     localparam BALL_RADIUS_SQ = BALL_RADIUS * BALL_RADIUS;
 
-    logic signed [10:0] h_ball_pos_diff;
-    logic signed [ 9:0] v_ball_pos_diff;
+    logic signed  [9:0] h_ball_pos_diff;
+    logic signed [10:0] v_ball_pos_diff;
     logic        [21:0] ball_dist_squared;
 
-    assign h_ball_pos_diff = signed'((i_h_coord) - (i_screen_ball_x));
-    assign v_ball_pos_diff = signed'((i_v_coord) - (i_screen_ball_y));
+    assign h_ball_pos_diff = signed'(10'(i_h_coord) - 10'(i_screen_ball_x));
+    assign v_ball_pos_diff = signed'((i_v_coord) - 11'(i_screen_ball_y));
 
     assign ball_dist_squared = h_ball_pos_diff * h_ball_pos_diff +
                                v_ball_pos_diff * v_ball_pos_diff;

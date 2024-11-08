@@ -1,5 +1,5 @@
 module safe_zone # (
-    parameter SCREEN_WIDTH  = 800,
+    parameter SCREEN_WIDTH  = 400,
     parameter SCREEN_HEIGHT = 600,
     parameter BLOCK_SIZE    = 10
 )(
@@ -103,8 +103,6 @@ always_ff @(posedge clk) begin
         subarray[subx][suby] <= random_res;
     end
 end
-
-// TODO mem write
 
 localparam MEMADDR_WIDTH = $clog2(SCREEN_WIDTH/BLOCK_SIZE * SCREEN_HEIGHT/BLOCK_SIZE);
 

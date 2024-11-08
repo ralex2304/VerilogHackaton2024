@@ -1,5 +1,5 @@
 module game_engine # (
-    parameter SCREEN_WIDTH  = 800,
+    parameter SCREEN_WIDTH  = 400,
     parameter SCREEN_HEIGHT = 600,
     parameter BALL_RADIUS   = 10,
     parameter BLOCK_SIZE    = 10,
@@ -52,7 +52,7 @@ safe_zone # (
 );
 
 ball_positioner # (
-    .SCREEN_WIDTH  (SCREEN_HEIGHT),
+    .SCREEN_WIDTH  (SCREEN_WIDTH),
     .SCREEN_HEIGHT (SCREEN_HEIGHT),
     .BALL_RADIUS   (BALL_RADIUS)
 ) ball_positioner_inst (

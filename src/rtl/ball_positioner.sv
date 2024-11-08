@@ -1,5 +1,5 @@
 module ball_positioner # (
-    parameter SCREEN_WIDTH  = 800,
+    parameter SCREEN_WIDTH  = 400,
     parameter SCREEN_HEIGHT = 600,
     parameter BALL_RADIUS   = 20
 )(
@@ -9,7 +9,7 @@ module ball_positioner # (
     input  logic  [7:0] i_accel_x,
     input  logic  [7:0] i_accel_y,
 
-    output logic [9:0] o_ball_x,
+    output logic [8:0] o_ball_x,
     output logic [9:0] o_ball_y
 );
 
@@ -68,7 +68,7 @@ always_ff @(posedge clk or negedge arst_n) begin
     end
 end
 
-assign o_ball_x = ball_pos_x[9:0];
+assign o_ball_x = ball_pos_x[8:0];
 assign o_ball_y = ball_pos_y[9:0];
 
 endmodule

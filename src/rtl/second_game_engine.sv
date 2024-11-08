@@ -19,7 +19,7 @@ module second_game_engine # (
     input logic         i_is_mouse_dy_neg,
 
     input logic   [8:0] i_screen_x,
-    input logic   [8:0] i_screen_y,
+    input logic   [9:0] i_screen_y,
 
     output logic        o_is_obstacle,
 
@@ -40,7 +40,7 @@ localparam SECOND_GAME_SQUARES_NUM_Y = SECOND_GAME_HEIGHT / SECOND_GAME_SQUARE_S
 */
 
 logic [8:0] fucking_shit_left_x[SECOND_GAME_NUM_OBSTACLES];
-logic [8:0] fucking_shit_left_y[SECOND_GAME_NUM_OBSTACLES];
+logic [9:0] fucking_shit_left_y[SECOND_GAME_NUM_OBSTACLES];
 
 logic [8:0] fucking_shit_right_x[SECOND_GAME_NUM_OBSTACLES];
 logic [8:0] fucking_shit_right_y[SECOND_GAME_NUM_OBSTACLES];
@@ -56,9 +56,9 @@ always_ff @(posedge clk or negedge arst_n) begin
         ball_x <= SECOND_GAME_START_X;
         for (i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
             fucking_shit_left_x[i]  <= 100;
-            fucking_shit_left_y[i]  <= (50 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE));
+            fucking_shit_left_y[i]  <= 10'(50 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE));
             fucking_shit_right_x[i] <= 200;
-            fucking_shit_right_y[i] <= (50 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE));
+            fucking_shit_right_y[i] <= 9'(50 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE));
         end
 
     end else begin
