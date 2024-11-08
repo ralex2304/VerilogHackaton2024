@@ -21,20 +21,12 @@ module top_sberday (
   output  logic  [7:0]      sdl_b
 );
 //------------- Variables                                        -------------//
-localparam SCREEN_WIDTH  = 800;
-localparam SCREEN_HEIGHT = 600;
-
 logic                      [10:0] h_coord;
 logic                       [9:0] v_coord;
 logic                       [3:0] red;
 logic                       [3:0] green;
 logic                       [3:0] blue;
-logic                           disp_enbl;
-logic  [$clog2(SCREEN_WIDTH)-1:0] screen_ball_x;
-logic [$clog2(SCREEN_HEIGHT)-1:0] screen_ball_y;
-logic                             ball_is_safe;
-logic  [$clog2(SCREEN_WIDTH)-1:0] screen_x;
-logic [$clog2(SCREEN_HEIGHT)-1:0] screen_y;
+logic                             disp_enbl;
 //____________________________________________________________________________//
 /*
 //------------- Demo module                                      -------------//
@@ -71,62 +63,36 @@ logic [$clog2(SCREEN_HEIGHT)-1:0] screen_y;
   );
 //____________________________________________________________________________//
 */
-game_engine # (
-    .SCREEN_WIDTH  (SCREEN_WIDTH),
-    .SCREEN_HEIGHT (SCREEN_HEIGHT)
-) engine (
+
+game_console game_console_inst (
     .clk                (pixel_clk),
     .arst_n             (~sim_rst),
 
     // Accel
-    .i_accel_dx         (8'b1), // TODO
-    .i_accel_dy         (8'b1),
-    // Switches
-    .i_switches         ('0), // TODO
-    // Buttons
-    .i_btn_center       (), // TODO
-    .i_btn_left         (),
-    .i_btn_right        (),
-    .i_btn_up           (button_u),
-    .i_btn_down         (),
+    .accel_data_x       ('0),// TODO
+    .accel_data_y       ('0),
     // Mouse
-    .i_mouse_dx         (),
-    .i_mouse_dy         (),
-    // Graphic
-    .i_screen_x         (screen_x),
-    .i_screen_y         (screen_y),
-    .o_screen_ball_x    (screen_ball_x),
-    .o_screen_ball_y    (screen_ball_y),
-    .o_is_safe          (ball_is_safe),
+    .mouse_x            (),
+    .is_mouse_x_neg     (),
+    .mouse_y            (),
+    .is_mouse_y_neg     (),
+    // Switches
+    .switches           ({13'b0, sw2, sw1, sw0}),
+    // Buttons
+    .button_c           (button_c),
+    .button_u           (button_u),
+    .button_d           (button_d),
+    .button_r           (button_r),
+    .button_l           (button_l),
+    // Monitor
+    .monitor_h_coord    (h_coord[10:0]),
+    .monitor_v_coord    (v_coord[9:0]),
+    .monitor_enable     (disp_enbl),
+    .monitor_r          (red),
+    .monitor_g          (green),
+    .monitor_b          (blue),
     // Quad display
-    .o_disp_data        ()
-);
-
-graphic # (
-    .SCREEN_WIDTH       (SCREEN_WIDTH),
-    .SCREEN_HEIGHT      (SCREEN_HEIGHT),
-    .BALL_RADIUS        (20),
-
-    .BALL_COLOR         (12'hF00),  // Red
-    .SAFE_COLOR         (12'h0F0),  // Green
-    .BKG_COLOR          (12'h00F)   // Blue
-) graphic_inst (
-    .o_screen_x         (screen_x),
-    .o_screen_y         (screen_y),
-
-    .i_is_safe          (ball_is_safe),
-
-    .i_screen_ball_x    (screen_ball_x),
-    .i_screen_ball_y    (screen_ball_y),
-
-    // VGA
-    .o_red              (red),     // 4-bit color output
-    .o_green            (green),   // 4-bit color output
-    .o_blue             (blue),    // 4-bit color output
-
-    .i_disp_enbl        (disp_enbl),    // display enable (0 = all colors must be blank)
-    .i_h_coord          (h_coord[10:0]),    // horizontal pixel coordinate
-    .i_v_coord          (v_coord[ 9:0])
+    .quad_disp          ()
 );
 
 //------------- SDL controller                                   -------------//

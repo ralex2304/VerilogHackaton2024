@@ -1,7 +1,7 @@
 module graphic # (
     parameter SCREEN_WIDTH   = 800,
     parameter SCREEN_HEIGHT  = 600,
-    parameter BALL_RADIUS    = 20,
+    parameter BALL_RADIUS    = 10,
 
     parameter [11:0] BALL_COLOR = 12'hF00,  // Red
     parameter [11:0] SAFE_COLOR = 12'h0F0,  // Green

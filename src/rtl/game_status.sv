@@ -1,35 +1,30 @@
 // rating: проверяет текущий is_win / is_lose
 //         хранит текущий рейтинг
 
-// not started
-// running 
-// paused
-// game over
 
 module game_status # (
-    // parameters
-    localparam RATING_WIDTH     = 8,
-    localparam GAME_STATE_WIDTH = 2
+    parameter RATING_WIDTH = 8,
+    parameter NUM_IMAGES   = 4
 )(
-    input logic                                 clk             ,
-    input logic                                 rst_n           ,  
+    input  logic                                clk,
+    input  logic                                rst_n,
 
-    // safe zone (?)
-    input logic                                 i_is_win        , // is round win or lose
-    input logic                                 i_round_ended   , // is round ended
-    input logic                                 i_ready         , // is safe zone end generation
+    // safe zone
+    input  logic                                i_is_win,           // is round win or lose
+    input  logic                                i_round_ended,      // is round ended
+    input  logic                                i_ready,            // is safe zone end generation
+    output logic                                o_regenerate_level,
 
     // button
-    input logic                                 i_pause_game    ,  
-    output logic                                o_is_game_paused,    
+    input  logic                                i_pause_game,
+    input  logic                                i_start_game,
 
-    output logic    [RATING_WIDTH - 1 : 0]      o_current_rating,
-    output logic    [GAME_STATE_WIDTH - 1 : 0]  o_game_status   
+    output logic             [RATING_WIDTH-1:0] o_current_rating,
+    output logic                                o_game_running,
+    output logic       [$clog2(NUM_IMAGES)-1:0] o_image_number
 );
 
-// rating
-
-logic [RATING_WIDTH - 1 : 0] rating_count;
+logic [RATING_WIDTH-1:0] rating_count;
 
 always @ (posedge clk or negedge rst_n) begin
     if (!rst_n) begin
@@ -37,45 +32,59 @@ always @ (posedge clk or negedge rst_n) begin
     end else begin
         if (i_round_ended)
             rating_count <= i_is_win ? rating_count + 1
-                                     : 1'b0;
+                                     : '0;
     end
 end
 
 assign o_current_rating = rating_count;
 
 // game state
-typedef enum bit[GAME_STATE_WIDTH - 1 : 0] {
-    LEVEL_GENERATING = 2'b00,
-
-    LEVEL_RUNNING    = 2'b01,
-    GAME_OVER        = 2'b10
+typedef enum logic [2:0] {
+    INITIAL          = 3'h0,
+    LEVEL_GENERATING = 3'h1,
+    LEVEL_RUNNING    = 3'h2,
+    LEVEL_PAUSED     = 3'h3,
+    GAME_OVER        = 3'h4
 } game_state;
 
-game_state gstate;
+game_state gstate, gstate_next;
 // logic is_paused;
+
+always_comb begin
+    case (gstate)
+        INITIAL:            gstate_next = i_start_game ? LEVEL_GENERATING : INITIAL;
+        LEVEL_GENERATING:   gstate_next = i_ready ? LEVEL_RUNNING : LEVEL_GENERATING;
+        LEVEL_RUNNING:      if (i_round_ended) begin
+                                gstate_next = i_is_win ? LEVEL_GENERATING : GAME_OVER;
+                            end else begin
+                                gstate_next = i_pause_game ? LEVEL_PAUSED : LEVEL_RUNNING;
+                            end
+        LEVEL_PAUSED:       gstate_next = i_start_game ? LEVEL_RUNNING : LEVEL_PAUSED;
+        GAME_OVER:          gstate_next = i_start_game ? LEVEL_GENERATING : GAME_OVER;
+        default:            gstate_next = INITIAL;
+    endcase
+end
 
 always @ (posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         gstate <= LEVEL_GENERATING;
     end else begin
-        if (!i_pause_game) begin // NOTE ?
-            if (i_round_ended) begin
-                gstate <= i_is_win ? LEVEL_GENERATING
-                                   : GAME_OVER;
-            end
-
-            if (i_ready) begin
-                gstate <= LEVEL_RUNNING;
-            end
-        end
+        gstate <= gstate_next;
     end
-end 
+end
 
-assign o_game_status = gstate;
+assign o_game_running     = (gstate == LEVEL_RUNNING);
+assign o_regenerate_level = (gstate != LEVEL_GENERATING) && (gstate_next == LEVEL_GENERATING);
 
-// game pause
+always_comb begin
+    case (gstate)
+        INITIAL:            o_image_number = 2'b00;
+        LEVEL_PAUSED:       o_image_number = 2'b01;
+        GAME_OVER:          o_image_number = 2'b10;
+        LEVEL_GENERATING:   o_image_number = 2'b11;
 
-assign o_is_game_paused = i_pause_game;
-
+        default:            o_image_number = 2'b00;
+    endcase
+end
 
 endmodule

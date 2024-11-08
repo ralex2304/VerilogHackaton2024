@@ -89,13 +89,13 @@ pseudo_random_generator prg_inst (
 
 always_comb begin
     if (upper_exists && left_exists && ludiag_exists)
-        random_res = random < 2**RAND_WIDTH * 0.25;
+        random_res = random < 8'(integer'(2**RAND_WIDTH * 0.25));
     else if (upper_exists && left_exists)
-        random_res = random < 2**RAND_WIDTH * 0.75;
+        random_res = random < 8'(integer'(2**RAND_WIDTH * 0.75));
     else if (!upper_exists && !left_exists && !ludiag_exists)
-        random_res = random < 2**RAND_WIDTH * 0.25;
+        random_res = random < 8'(integer'(2**RAND_WIDTH * 0.25));
     else
-        random_res = random < 2**RAND_WIDTH * 0.5;
+        random_res = random < 8'(integer'(2**RAND_WIDTH * 0.5));
 end
 
 always_ff @(posedge clk) begin
