@@ -21,7 +21,7 @@ logic signed [10:0] ball_pos_x, ball_pos_x_next,
 logic signed [10:0] velocity_x, velocity_x_next,
                     velocity_y, velocity_y_next;
 
-logic [22:0] timer;
+logic [19:0] timer;
 
 always_comb begin
     velocity_x_next = velocity_x + {3'b0, signed'(i_accel_x)};
