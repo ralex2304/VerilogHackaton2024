@@ -54,10 +54,10 @@ logic [17:0] timer;
 logic [8:0] ball_x, ball_x_next;
 logic [9:0] ball_y, ball_y_next;
 
-logic signed [15:0] ball_x_frac, ball_x_frac_next;
-logic signed [15:0] ball_y_frac, ball_y_frac_next;
+logic signed [24:0] ball_x_frac, ball_x_frac_next;
+logic signed [24:0] ball_y_frac, ball_y_frac_next;
 
-localparam MAX_FRAC = 2**14;
+localparam MAX_FRAC = 2**16;
 
 logic [9:0] hole_size;
 logic [1:0] hole_smallanator;
@@ -117,6 +117,10 @@ always_ff @(posedge clk or negedge arst_n) begin
     end else if (i_is_pause) begin
 
     end else if (is_loss) begin
+        ball_x <=  9'(SECOND_GAME_WIDTH / 2);
+        ball_y <= 10'(SECOND_GAME_HEIGHT - 100);
+        ball_x_frac <= '0;
+        ball_y_frac <= '0;
         for (integer i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
             fucking_shit_left_y [i] <= 12'(signed'(-400 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE)));
             fucking_shit_right_y[i] <= 12'(signed'(-400 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE)));
@@ -133,9 +137,23 @@ always_ff @(posedge clk or negedge arst_n) begin
 
         ball_x_frac <= ball_x_frac_next;
         ball_y_frac <= ball_y_frac_next;
-        ball_x <= ball_x_next;
-        ball_y <= ball_y_next;
+        if (ball_x > 9'(SECOND_GAME_WIDTH - SECOND_GAME_SQUARE_SIZE)) begin
+            ball_x <= SECOND_GAME_SQUARE_SIZE / 2 + 1;
+        end else if (ball_x < SECOND_GAME_SQUARE_SIZE / 2) begin
+            ball_x <= 9'(SECOND_GAME_WIDTH - SECOND_GAME_SQUARE_SIZE - 3);
+        end else begin
+            ball_x <= ball_x_next;
+        end
 
+        if (ball_y > 10'(SECOND_GAME_HEIGHT - SECOND_GAME_SQUARE_SIZE)) begin
+            ball_y <= SECOND_GAME_HEIGHT - SECOND_GAME_SQUARE_SIZE;
+        end else if (ball_y < 10'(SECOND_GAME_SQUARE_SIZE)) begin
+            ball_y <= SECOND_GAME_SQUARE_SIZE;
+        end else begin
+            ball_y <= ball_y_next;
+        end
+
+        
         timer <= timer + 1;
         if (timer == 0) begin
 
