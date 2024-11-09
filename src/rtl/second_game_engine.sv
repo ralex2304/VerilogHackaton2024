@@ -12,15 +12,14 @@ module second_game_engine # (
     input logic         clk,
     input logic         arst_n,
 
-    input logic   [7:0] i_mouse_dx,
-    input logic   [7:0] i_mouse_dy,
+    input  logic        i_button_l,
+    input  logic        i_button_r,
+    input  logic        i_button_u,
+    input  logic        i_button_d,
 
-    input logic         i_is_mouse_dx_neg,
-    input logic         i_is_mouse_dy_neg,
-
-    input logic   [8:0] i_screen_x,
-    input logic   [9:0] i_screen_y,
-    input logic         i_is_pause,
+    input  logic  [8:0] i_screen_x,
+    input  logic  [9:0] i_screen_y,
+    input  logic        i_is_pause,
 
     output logic        o_is_obstacle,
 
@@ -52,8 +51,13 @@ logic signed [11:0] fucking_shit_right_y[SECOND_GAME_NUM_OBSTACLES];
 
 // NOTE: change timer size to chenge speed
 logic [17:0] timer;
-logic [8:0] ball_x;
-logic [9:0] ball_y;
+logic [8:0] ball_x, ball_x_next;
+logic [9:0] ball_y, ball_y_next;
+
+logic signed [13:0] ball_x_frac, ball_x_frac_next;
+logic signed [13:0] ball_y_frac, ball_y_frac_next;
+
+localparam MAX_FRAC = 2**12;
 
 logic [9:0] hole_size;
 logic [1:0] hole_smallanator;
@@ -67,6 +71,29 @@ pseudo_random_generator prg_inst (
 
 logic is_loss;
 
+always_comb begin
+    ball_x_frac_next = ball_x_frac + (i_button_r ? 1 : '0) - (i_button_l ? 1 : '0);
+    ball_y_frac_next = ball_y_frac + (i_button_u ? 1 : '0) - (i_button_d ? 1 : '0);
+    ball_x_next = ball_x;
+    ball_y_next = ball_y;
+
+    if (ball_x_frac > MAX_FRAC) begin
+        ball_x_next = ball_x + 1;
+        ball_x_frac_next = '0;
+    end else if (ball_x_frac < -MAX_FRAC) begin
+        ball_x_next = ball_x - 1;
+        ball_x_frac_next = '0;
+    end
+
+    if (ball_y_frac > MAX_FRAC) begin
+        ball_y_next = ball_y + 1;
+        ball_y_frac_next = '0;
+    end else if (ball_y_frac < -MAX_FRAC) begin
+        ball_y_next = ball_y - 1;
+        ball_y_frac_next = '0;
+    end
+end
+
 always_ff @(posedge clk or negedge arst_n) begin
     is_loss <= 0;
     if (!arst_n) begin
@@ -78,6 +105,8 @@ always_ff @(posedge clk or negedge arst_n) begin
         hole_smallanator <= 1;
         ball_x <=  9'(SECOND_GAME_WIDTH / 2);
         ball_y <= 10'(SECOND_GAME_HEIGHT - 100);
+        ball_x_frac <= '0;
+        ball_y_frac <= '0;
         for (i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
             fucking_shit_left_y [i] <= 12'(signed'(-400 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE)));
             fucking_shit_right_y[i] <= 12'(signed'(-400 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE)));
@@ -89,10 +118,10 @@ always_ff @(posedge clk or negedge arst_n) begin
 
     end else if (is_loss) begin
         for (integer i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
-            fucking_shit_left_y [i] = 12'(signed'(-400 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE)));
-            fucking_shit_right_y[i] = 12'(signed'(-400 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE)));
-            fucking_shit_left_x [i] = 50;
-            fucking_shit_right_x[i] = 350;
+            fucking_shit_left_y [i] <= 12'(signed'(-400 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE)));
+            fucking_shit_right_y[i] <= 12'(signed'(-400 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE)));
+            fucking_shit_left_x [i] <= 50;
+            fucking_shit_right_x[i] <= 350;
         end
     end else begin
         if (hole_size > 40 && hole_smallanator == 0) begin
@@ -102,7 +131,11 @@ always_ff @(posedge clk or negedge arst_n) begin
             hole_size <= hole_size;
         end
 
-        ball_x <= ball_x + i_mouse_dx;
+        ball_x_frac <= ball_x_frac_next;
+        ball_y_frac <= ball_y_frac_next;
+        ball_x <= ball_x_next;
+        ball_y <= ball_y_next;
+
         timer <= timer + 1;
         if (timer == 0) begin
 

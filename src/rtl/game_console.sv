@@ -5,11 +5,6 @@ module game_console (
     // Accel
     input  logic       [7:0] accel_data_x,
     input  logic       [7:0] accel_data_y,
-    // Mouse
-    input  logic       [7:0] mouse_x,
-    input  logic             is_mouse_x_neg,
-    input  logic       [7:0] mouse_y,
-    input  logic             is_mouse_y_neg,
     // Switches
     input  logic      [15:0] switches,
     // Buttons
@@ -59,6 +54,9 @@ logic [3:0] banner_b, game_b, game2_b;
 
 logic [RATING_WIDTH-1:0] rating;
 
+assign game1_state = {game_win, game_lose};
+assign game2_state = {game2_win, game2_lose};
+
 game_status # (
     .RATING_WIDTH (RATING_WIDTH),
     .NUM_IMAGES   (NUM_IMAGES)
@@ -72,8 +70,8 @@ game_status # (
     .o_regenerate_level (regen_level),
 
     // button
-    .i_pause_game       (button_l),
-    .i_start_game       (button_r),
+    .i_pause_game       (switches[0]),
+    .i_start_game       (button_c),
 
     .o_current_rating   (rating),
     .o_game_running     (game_running),
@@ -162,10 +160,10 @@ second_game_engine #(
     .clk                                (clk),
     .arst_n                             (arst_n),
 
-    .i_mouse_dx                         (mouse_x),
-    .i_mouse_dy                         (mouse_y),
-    .i_is_mouse_dx_neg                  (is_mouse_x_neg),
-    .i_is_mouse_dy_neg                  (is_mouse_y_neg),
+    .i_button_l                         (button_l),
+    .i_button_r                         (button_r),
+    .i_button_u                         (button_u),
+    .i_button_d                         (button_d),
 
     .i_screen_x                         (game2_screen_x),
     .i_screen_y                         (game2_screen_y),

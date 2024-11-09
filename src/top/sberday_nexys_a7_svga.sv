@@ -27,7 +27,10 @@ module sberday_nexys_a7_svga (
     output  logic  [ 3:0]    VGA_G     ,
     output  logic  [ 3:0]    VGA_B     ,
     output  logic            VGA_HS    ,
-    output  logic            VGA_VS
+    output  logic            VGA_VS    ,
+  //----------- PS/2
+    input   logic            PS2_CLK   ,
+    input   logic            PS2_DATA
 );
 
 
@@ -60,11 +63,12 @@ module sberday_nexys_a7_svga (
     wire [7:0]     accel_data_y;     // FPGA board accelerometer Y data
     wire [7:0]     accel_x_end_of_frame;
     wire [7:0]     accel_y_end_of_frame;
-  //----------- Demo                                             -----------//
-    wire [1:0]      demo_regime_status;
+  //----------- Mouse
+    logic [7:0] mouse_x, mouse_y;
+    logic mouse_x_neg, mouse_y_neg;
 
     // REVIEW
-  //----------- Game States 
+  //----------- Game States
     logic [1:0]   game1_state; // 1 == is_win, 0 == is_lose
     logic [1:0]   game2_state;
 
@@ -132,12 +136,12 @@ module sberday_nexys_a7_svga (
       .sw_up_o     ( button_d_u )
     );
   //----------- LEDs                                             -----------//
-      assign LED [15:8] = SW[15:8];
-      assign LED [7:3] = {button_u, button_l, button_r, button_d, button_c};
-      assign LED [1:0] = demo_regime_status;
-      //RGB
-      assign {LED16_R, LED16_G, LED16_B} = 3'b000;
-      assign {LED17_R, LED17_G, LED17_B} = 3'b000;
+    //   assign LED [15:8] = SW[15:8];
+    //   assign LED [7:3] = {button_u, button_l, button_r, button_d, button_c};
+    //   assign LED [1:0] = demo_regime_status;
+    //   //RGB
+    //   assign {LED16_R, LED16_G, LED16_B} = 3'b000;
+    //   assign {LED17_R, LED17_G, LED17_B} = 3'b000;
   //----------- Seven Segments Indicators                        -----------//
     // refresh frequency of about 1 KHz to 60Hz we need to devide by 8 //
     reg [12:0] digital_clock_divider;
@@ -211,11 +215,6 @@ game_console game_console_inst (
     // Accel
     .accel_data_x       (accel_data_x),
     .accel_data_y       (accel_data_y),
-    // Mouse
-    .mouse_x            (), // TODO
-    .is_mouse_x_neg     (),
-    .mouse_y            (),
-    .is_mouse_y_neg     (),
     // Switches
     .switches           (SW),
     // Buttons
@@ -271,12 +270,12 @@ game_console game_console_inst (
     led_game_status led_status (
         .rst_n(rst_n)                       ,
         .clk(clk)                           ,
-        
+
         .game1_state(game1_state)           , // 1 == is_win, 0 == is_lose
         .game2_state(game2_state)           ,
-        
-        .led16({LED16_R, LED16_G, LED16_B,}),
-        .led17({LED17_R, LED17_G, LED17_B,})
+
+        .led16({LED16_R, LED16_G, LED16_B}),
+        .led17({LED17_R, LED17_G, LED17_B})
     );
 // ------------------------------------------
 

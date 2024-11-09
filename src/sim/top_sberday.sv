@@ -71,11 +71,6 @@ game_console game_console_inst (
     // Accel
     .accel_data_x       (button_u ? 8'hef : '0),// TODO
     .accel_data_y       (button_d ? 8'hef : '0),
-    // Mouse
-    .mouse_x            (),
-    .is_mouse_x_neg     (),
-    .mouse_y            (),
-    .is_mouse_y_neg     (),
     // Switches
     .switches           ({13'b0, sw2, sw1, sw0}),
     // Buttons
@@ -92,7 +87,10 @@ game_console game_console_inst (
     .monitor_g          (green),
     .monitor_b          (blue),
     // Quad display
-    .quad_disp          ()
+    .quad_disp          (),
+
+    .game1_state        (),
+    .game2_state        ()
 );
 
 //------------- SDL controller                                   -------------//

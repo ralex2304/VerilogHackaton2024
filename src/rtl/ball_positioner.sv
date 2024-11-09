@@ -20,7 +20,7 @@ module ball_positioner # (
 localparam START_POS_X = SCREEN_WIDTH  / 2;
 localparam START_POS_Y = SCREEN_HEIGHT / 2;
 
-localparam MAX_FRAC_VEL = 2**10;
+localparam MAX_FRAC_VEL = 2**5;
 
 logic signed [10:0] ball_pos_x, ball_pos_x_next,
                     ball_pos_y, ball_pos_y_next;
@@ -59,7 +59,7 @@ always_comb begin
 
     if (ball_pos_x < BALL_RADIUS && velocity_x < 0) begin
         ball_pos_x_next = 11'(BALL_RADIUS);
-        velocity_x_next = -(velocity_x >> 2);
+        velocity_x_next = (-velocity_x) >> 2;
     end else if (ball_pos_x > 11'(SCREEN_WIDTH - BALL_RADIUS) && velocity_x > 0) begin
         ball_pos_x_next = 11'(SCREEN_WIDTH - BALL_RADIUS);
         velocity_x_next = -(velocity_x >> 2);
@@ -67,7 +67,7 @@ always_comb begin
 
     if (ball_pos_y < BALL_RADIUS && velocity_y < 0) begin
         ball_pos_y_next = BALL_RADIUS;
-        velocity_y_next = -(velocity_y >> 2);
+        velocity_y_next = (-velocity_y) >> 2;
     end else if (ball_pos_y > SCREEN_HEIGHT - BALL_RADIUS && velocity_y > 0) begin
         ball_pos_y_next = SCREEN_HEIGHT - BALL_RADIUS;
         velocity_y_next = -(velocity_y >> 2);

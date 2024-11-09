@@ -72,7 +72,7 @@ logic [15:0] timer, lvl_begin, wait_time;
 
 timer # (
     .TIMER_WIDTH (16),
-    .CLK_FREQ    (36_000_00) // FIXME fix timer
+    .CLK_FREQ    (36_000_000)
 ) timer_inst (
     .clk            (clk),
     .rst_n          (arst_n),
@@ -94,6 +94,8 @@ always_ff @(posedge clk or negedge arst_n) begin
 end
 
 assign round_ending = (timer - lvl_begin > wait_time) && !i_pause;
+
+assign o_timer = timer - lvl_begin;
 
 always_comb begin
     o_win  = 1'b0;
