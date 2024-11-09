@@ -15,6 +15,7 @@ module second_game_graphics # (
     input  logic                                         i_is_obstacle,
 
     input  logic [$clog2(SECOND_GAME_SCREEN_WIDTH )-1:0] i_screen_square_x,
+    input  logic [$clog2(SECOND_GAME_SCREEN_HEIGHT)-1:0] i_screen_square_y,
 
     // VGA
     output logic                                   [3:0] o_red,        // 4-bit color output
@@ -33,7 +34,7 @@ logic signed [10:0] h_coord;
 logic signed [10:0] v_coord;
 
 assign screen_square_x = signed'(10'(i_screen_square_x));
-assign screen_square_y = signed'(11'(SECOND_GAME_PLAYER_SIZE / 2));
+assign screen_square_y = signed'(11'(i_screen_square_y));
 
 assign h_coord = 11'(signed'(12'(i_h_coord)) - 12'(SECOND_GAME_START_X));
 assign v_coord = signed'(11'(i_v_coord));

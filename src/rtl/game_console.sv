@@ -142,6 +142,7 @@ graphic # (
 
 logic game2_is_obstacle;
 logic [8:0] game2_ball_x;
+logic [9:0] game2_ball_y;
 logic game2_gameover;
 
 second_game_engine #(
@@ -166,10 +167,13 @@ second_game_engine #(
     .i_screen_x                         (game2_screen_x),
     .i_screen_y                         (game2_screen_y),
 
+    .i_is_pause                         (~game_running),
+
     .o_is_obstacle                      (game2_is_obstacle),
 
     .o_ball_x                           (game2_ball_x),
-    .o_is_gameover                      (game2_gameover)
+    .o_ball_y                           (game2_ball_y),
+    .o_is_lose                          (game_lose)
 );
 
 second_game_graphics # (
@@ -189,6 +193,7 @@ second_game_graphics # (
     .i_is_obstacle              (game2_is_obstacle),
 
     .i_screen_square_x          (game2_ball_x),
+    .i_screen_square_y          (game2_ball_y),
 
     // VGA
     .o_red                      (game2_r),        // 4-bit color output

@@ -20,11 +20,14 @@ module second_game_engine # (
 
     input logic   [8:0] i_screen_x,
     input logic   [9:0] i_screen_y,
+    input logic         i_is_pause,
 
     output logic        o_is_obstacle,
 
     output logic  [8:0] o_ball_x,
-    output logic        o_is_gameover
+    output logic  [9:0] o_ball_y,
+
+    output logic        o_is_lose
 );
 
 localparam SECOND_GAME_SQUARES_NUM_X = SECOND_GAME_WIDTH  / SECOND_GAME_SQUARE_SIZE;
@@ -48,6 +51,7 @@ logic [10:0] fucking_shit_right_y[SECOND_GAME_NUM_OBSTACLES];
 // NOTE: change timer size to chenge speed
 logic [14:0] timer;
 logic [8:0] ball_x;
+logic [9:0] ball_y;
 
 logic [9:0] hole_size;
 logic [1:0] hole_smallanator;
@@ -70,11 +74,14 @@ always_ff @(posedge clk or negedge arst_n) begin
         timer <= 'b0;
         hole_size <= 75;
         hole_smallanator <= 1;
-        ball_x <= 9'(SECOND_GAME_START_X);
+        ball_x <=  9'(SECOND_GAME_WIDTH / 2);
+        ball_y <= 10'(SECOND_GAME_HEIGHT - 100);
         for (i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
             fucking_shit_left_y [i] <= 11'(50 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE));
             fucking_shit_right_y[i] <= 11'(50 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE));
         end
+
+    end else if (i_is_pause) begin
 
     end else begin
 
@@ -117,6 +124,7 @@ always_comb begin
     integer i;
     o_is_obstacle = 1'b0;
     o_ball_x = ball_x;
+    o_ball_y = ball_y;
     for (i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
         if (  11'(i_screen_y) >= fucking_shit_left_y[i] && 11'(i_screen_y) <=  fucking_shit_left_y[i] + SECOND_GAME_SQUARE_SIZE &&
             !( 9'(i_screen_x) >= fucking_shit_left_x[i] &&  9'(i_screen_x) <= fucking_shit_right_x[i])) begin
