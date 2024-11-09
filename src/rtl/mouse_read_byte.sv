@@ -4,9 +4,8 @@ module mouse_read_byte # (
 
 )(
     input logic                         rst_n           ,
-    input logic                         i_driver_clk    ,
 
-    // input logic                         io_mouse_clk    ,
+    input logic                         io_mouse_clk    ,
     input logic                         io_mouse_data   ,
 
     output logic   [BYTE_WIDTH-1:0]     o_byte          ,
@@ -15,7 +14,7 @@ module mouse_read_byte # (
 );
 
 localparam READ_STAGE_WIDTH = 4;
-typedef enum bit[READ_STAGE_WIDTH-1:0] { 
+typedef enum bit[READ_STAGE_WIDTH-1:0] {
     // NO_REQUEST            = 0,
 
     WAIT_DATA_ON_LOW      = 1,
@@ -32,7 +31,7 @@ read_stage rstage;
 logic [$clog2(BYTE_WIDTH)-1:0] shift;
 
 // NOTE negedge clk
-always @ (negedge i_driver_clk or negedge rst_n) begin
+always @ (negedge io_mouse_clk or negedge rst_n) begin
     if (!rst_n) begin
         timer <= BYTE_WIDTH - 1;
         shift <= 0;
@@ -64,7 +63,7 @@ always @ (negedge i_driver_clk or negedge rst_n) begin
                 shift <= shift + 1;
 
                 timer <= timer - 1;
-            end    
+            end
         end
 
         if (rstage == RECEIVE_PARITY) begin
@@ -82,11 +81,11 @@ always @ (negedge i_driver_clk or negedge rst_n) begin
         end
 
         // if (rstage == REMOVE_BYTE_READED) begin
-            
+
         //     rstage <= NO_REQUEST;
         // end
     end
 end
 
-endmodule   
+endmodule
 
