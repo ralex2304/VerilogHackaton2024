@@ -28,8 +28,8 @@ module game_console (
     // Quad display
     output logic      [31:0] quad_disp,
     // LED display
-    output logic [1:0] game1_state;
-    output logic [1:0] game2_state;
+    output logic [1:0] game1_state,
+    output logic [1:0] game2_state
 );
 
 localparam SCREEN_WIDTH  = 800;
