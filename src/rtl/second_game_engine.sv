@@ -39,38 +39,74 @@ localparam SECOND_GAME_SQUARES_NUM_Y = SECOND_GAME_HEIGHT / SECOND_GAME_SQUARE_S
 *   2 variables for each obstacle
 */
 
-logic [8:0] fucking_shit_left_x[SECOND_GAME_NUM_OBSTACLES];
-logic [9:0] fucking_shit_left_y[SECOND_GAME_NUM_OBSTACLES];
+logic [8:0]  fucking_shit_left_x[SECOND_GAME_NUM_OBSTACLES];
+logic [10:0] fucking_shit_left_y[SECOND_GAME_NUM_OBSTACLES];
 
-logic [8:0] fucking_shit_right_x[SECOND_GAME_NUM_OBSTACLES];
-logic [8:0] fucking_shit_right_y[SECOND_GAME_NUM_OBSTACLES];
+logic [8:0]  fucking_shit_right_x[SECOND_GAME_NUM_OBSTACLES];
+logic [10:0] fucking_shit_right_y[SECOND_GAME_NUM_OBSTACLES];
 
-logic [15:0] timer;
+// NOTE: change timer size to chenge speed
+logic [14:0] timer;
 logic [8:0] ball_x;
+
+logic [9:0] hole_size;
+logic [1:0] hole_smallanator;
+
+logic [7:0] random;
+pseudo_random_generator prg_inst (
+    .clk    (clk),
+    .arst_n (arst_n),
+    .o_prng (random)
+);
+
+logic random_sign;
+
+assign random_sign = random[3] ^ random[1] ^ random[2] ^ random[4];
 
 always_ff @(posedge clk or negedge arst_n) begin
     if (!arst_n) begin
 
         integer i;
         timer <= 'b0;
-        ball_x <= SECOND_GAME_START_X;
+        hole_size <= 75;
+        hole_smallanator <= 1;
+        ball_x <= 9'(SECOND_GAME_START_X);
         for (i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
-            fucking_shit_left_x[i]  <= 100;
-            fucking_shit_left_y[i]  <= 10'(50 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE));
-            fucking_shit_right_x[i] <= 200;
-            fucking_shit_right_y[i] <= 9'(50 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE));
+            fucking_shit_left_y [i] <= 11'(50 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE));
+            fucking_shit_right_y[i] <= 11'(50 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE));
         end
 
     end else begin
 
         integer i;
+
+        if (hole_size > 40 && hole_smallanator == 0) begin
+            hole_size <= hole_size - 1;
+            hole_smallanator <= hole_smallanator + 1;
+        end else begin
+            hole_size <= hole_size;
+        end
+
         ball_x <= ball_x + i_mouse_dx;
         timer <= timer + 1;
         if (timer == 0) begin
 
             for (i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
-                fucking_shit_left_y [i] <= fucking_shit_left_y [i] + 1;
-                fucking_shit_right_y[i] <= fucking_shit_right_y[i] + 1;
+                if (fucking_shit_left_y[i] > SECOND_GAME_HEIGHT) begin
+                    fucking_shit_left_y [i] <= 0;
+                    fucking_shit_right_y[i] <= 0;
+
+                    $display("hole_size: %d", 9'(unsigned'(hole_size)));
+
+                    fucking_shit_left_x [i] <= 200 + signed'(random[7:0]) - 9'(signed'(hole_size));
+                    fucking_shit_right_x[i] <= 200 + signed'(random[7:0]) + 9'(signed'(hole_size));
+
+                    hole_smallanator <= hole_smallanator + 1;
+
+                end else begin
+                    fucking_shit_left_y [i] <= fucking_shit_left_y [i] + 1;
+                    fucking_shit_right_y[i] <= fucking_shit_right_y[i] + 1;
+                end
             end
 
         end
@@ -82,8 +118,11 @@ always_comb begin
     o_is_obstacle = 1'b0;
     o_ball_x = ball_x;
     for (i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
-        if (  i_screen_y >= fucking_shit_left_y[i] && i_screen_y <=  fucking_shit_left_y[i] + SECOND_GAME_SQUARE_SIZE &&
-            !(i_screen_x >= fucking_shit_left_x[i] && i_screen_x <= fucking_shit_right_x[i] + SECOND_GAME_SQUARE_SIZE)) begin
+        if (  11'(i_screen_y) >= fucking_shit_left_y[i] && 11'(i_screen_y) <=  fucking_shit_left_y[i] + SECOND_GAME_SQUARE_SIZE &&
+            !( 9'(i_screen_x) >= fucking_shit_left_x[i] &&  9'(i_screen_x) <= fucking_shit_right_x[i])) begin
+            // $display("left:   %d", fucking_shit_left_x[i]);
+            // $display("right:  %d", fucking_shit_right_x[i]);
+            // $display("i_screen: %d %d", i_screen_x, i_screen_y);
             o_is_obstacle = 1'b1;
             break;
         end

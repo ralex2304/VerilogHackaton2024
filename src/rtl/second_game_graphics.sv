@@ -35,16 +35,16 @@ logic signed [10:0] v_coord;
 assign screen_square_x = signed'(10'(i_screen_square_x));
 assign screen_square_y = signed'(11'(SECOND_GAME_PLAYER_SIZE / 2));
 
-assign h_coord = 11'(signed'(12'(i_h_coord)));
-assign v_coord = signed'(11'(i_v_coord)) - SECOND_GAME_START_X;
+assign h_coord = 11'(signed'(12'(i_h_coord)) - SECOND_GAME_START_X);
+assign v_coord = signed'(11'(i_v_coord));
 
 always_comb begin
     if (!i_disp_enbl) begin
         o_red   = 4'b0000;
         o_green = 4'b0000;
         o_blue  = 4'b0000;
-    end else if (screen_square_x - SECOND_GAME_PLAYER_SIZE <= h_coord && h_coord <= screen_square_x + SECOND_GAME_PLAYER_SIZE
-                && screen_square_y - SECOND_GAME_PLAYER_SIZE <= v_coord && v_coord <= screen_square_y + SECOND_GAME_PLAYER_SIZE) begin
+    end else if (   screen_square_x - SECOND_GAME_PLAYER_SIZE <= h_coord && h_coord <= screen_square_x + SECOND_GAME_PLAYER_SIZE
+                 && screen_square_y - SECOND_GAME_PLAYER_SIZE <= v_coord && v_coord <= screen_square_y + SECOND_GAME_PLAYER_SIZE) begin
         {o_red, o_green, o_blue} = SECOND_GAME_PLAYER_COLOR;
     end else if (i_is_obstacle) begin
         {o_red, o_green, o_blue} = SECOND_GAME_OBSTACLE_COLOR;
@@ -52,8 +52,8 @@ always_comb begin
         {o_red, o_green, o_blue} = SECOND_GAME_BKG_COLOR;
     end
 
-    o_screen_x = i_h_coord[$clog2(SECOND_GAME_SCREEN_WIDTH )-1:0];
-    o_screen_y = i_v_coord[$clog2(SECOND_GAME_SCREEN_HEIGHT)-1:0];
+    o_screen_x = h_coord[$clog2(SECOND_GAME_SCREEN_WIDTH )-1:0];
+    o_screen_y = v_coord[$clog2(SECOND_GAME_SCREEN_HEIGHT)-1:0];
 end
 
 endmodule
