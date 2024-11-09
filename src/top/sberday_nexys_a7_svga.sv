@@ -63,6 +63,11 @@ module sberday_nexys_a7_svga (
   //----------- Demo                                             -----------//
     wire [1:0]      demo_regime_status;
 
+    // REVIEW
+  //----------- Game States 
+    logic [1:0]   game1_state; // 1 == is_win, 0 == is_lose
+    logic [1:0]   game2_state;
+
   //----------- Clock & Reset                                    -----------//
     //--------- PLL                                              ---------//
       clk_wiz_0 clk_gen (
@@ -227,7 +232,10 @@ game_console game_console_inst (
     .monitor_g          (green),
     .monitor_b          (blue),
     // Quad display
-    .quad_disp          (sevseg_32bit_hex_val)
+    .quad_disp          (sevseg_32bit_hex_val),
+    // LED display
+    .game1_state        (game1_state),
+    .game2_state        (game2_state)
 );
 
 //------------- VGA controller                                   -------------//
@@ -257,5 +265,19 @@ game_console game_console_inst (
           VGA_VS <= v_sync;
       end
 //____________________________________________________________________________//
+
+// RGBs game status -------------------------
+
+    led_game_status led_status (
+        .rst_n(rst_n)                       ,
+        .clk(clk)                           ,
+        
+        .game1_state(game1_state)           , // 1 == is_win, 0 == is_lose
+        .game2_state(game2_state)           ,
+        
+        .led16({LED16_R, LED16_G, LED16_B,}),
+        .led17({LED17_R, LED17_G, LED17_B,})
+    );
+// ------------------------------------------
 
 endmodule
