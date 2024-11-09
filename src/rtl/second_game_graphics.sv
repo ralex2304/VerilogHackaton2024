@@ -3,12 +3,12 @@ module second_game_graphics # (
     parameter SECOND_GAME_START_Y =   0,
     parameter SECOND_GAME_SCREEN_WIDTH   = 400,
     parameter SECOND_GAME_SCREEN_HEIGHT  = 600,
-    parameter SECOND_GAME_PLAYER_SIZE = 20,
-
-    parameter [11:0] SECOND_GAME_PLAYER_COLOR   = 12'hF00,  // Red
-    parameter [11:0] SECOND_GAME_OBSTACLE_COLOR = 12'h0F0,  // Green
-    parameter [11:0] SECOND_GAME_BKG_COLOR      = 12'h00F   // Blue
+    parameter SECOND_GAME_PLAYER_SIZE = 20
 ) (
+    input logic                                   [11:0] i_player_color,
+    input logic                                   [11:0] i_obstacle_color,
+    input logic                                   [11:0] i_bkg_color,
+
     output logic [$clog2(SECOND_GAME_SCREEN_WIDTH )-1:0] o_screen_x,
     output logic [$clog2(SECOND_GAME_SCREEN_HEIGHT)-1:0] o_screen_y,
 
@@ -46,11 +46,11 @@ always_comb begin
         o_blue  = 4'b0000;
     end else if (   screen_square_x - SECOND_GAME_PLAYER_SIZE <= h_coord && h_coord <= screen_square_x + SECOND_GAME_PLAYER_SIZE
                  && screen_square_y - SECOND_GAME_PLAYER_SIZE <= v_coord && v_coord <= screen_square_y + SECOND_GAME_PLAYER_SIZE) begin
-        {o_red, o_green, o_blue} = SECOND_GAME_PLAYER_COLOR;
+        {o_red, o_green, o_blue} = i_player_color;
     end else if (i_is_obstacle) begin
-        {o_red, o_green, o_blue} = SECOND_GAME_OBSTACLE_COLOR;
+        {o_red, o_green, o_blue} = i_obstacle_color;
     end else begin
-        {o_red, o_green, o_blue} = SECOND_GAME_BKG_COLOR;
+        {o_red, o_green, o_blue} = i_bkg_color;
     end
 
     o_screen_x = h_coord[$clog2(SECOND_GAME_SCREEN_WIDTH )-1:0];

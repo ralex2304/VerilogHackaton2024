@@ -1,12 +1,12 @@
 module graphic # (
     parameter SCREEN_WIDTH   = 400,
     parameter SCREEN_HEIGHT  = 600,
-    parameter BALL_RADIUS    = 10,
-
-    parameter [11:0] BALL_COLOR = 12'hF00,  // Red
-    parameter [11:0] SAFE_COLOR = 12'h0F0,  // Green
-    parameter [11:0] BKG_COLOR  = 12'h00F   // Blue
+    parameter BALL_RADIUS    = 10
 ) (
+    input logic                       [11:0] i_ball_color,
+    input logic                       [11:0] i_safe_color,
+    input logic                       [11:0] i_bkg_color,
+
     output logic [$clog2(SCREEN_WIDTH )-1:0] o_screen_x,
     output logic [$clog2(SCREEN_HEIGHT)-1:0] o_screen_y,
 
@@ -43,11 +43,11 @@ module graphic # (
             o_green = 4'b0000;
             o_blue  = 4'b0000;
         end else if (ball_dist_squared <= BALL_RADIUS_SQ) begin
-            {o_red, o_green, o_blue} = BALL_COLOR;
+            {o_red, o_green, o_blue} = i_ball_color;
         end else if (i_is_safe) begin
-            {o_red, o_green, o_blue} = SAFE_COLOR;
+            {o_red, o_green, o_blue} = i_safe_color;
         end else begin
-            {o_red, o_green, o_blue} = BKG_COLOR;
+            {o_red, o_green, o_blue} = i_bkg_color;
         end
 
         o_screen_x = i_h_coord[$clog2(SCREEN_WIDTH )-1:0];
