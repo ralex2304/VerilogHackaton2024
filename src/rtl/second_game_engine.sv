@@ -54,10 +54,10 @@ logic [17:0] timer;
 logic [8:0] ball_x, ball_x_next;
 logic [9:0] ball_y, ball_y_next;
 
-logic signed [13:0] ball_x_frac, ball_x_frac_next;
-logic signed [13:0] ball_y_frac, ball_y_frac_next;
+logic signed [15:0] ball_x_frac, ball_x_frac_next;
+logic signed [15:0] ball_y_frac, ball_y_frac_next;
 
-localparam MAX_FRAC = 2**12;
+localparam MAX_FRAC = 2**14;
 
 logic [9:0] hole_size;
 logic [1:0] hole_smallanator;

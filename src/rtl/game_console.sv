@@ -52,6 +52,8 @@ logic [3:0] banner_r, game_r, game2_r;
 logic [3:0] banner_g, game_g, game2_g;
 logic [3:0] banner_b, game_b, game2_b;
 
+logic [11:0] ball_color, safe_color, bkg_color;
+
 logic [RATING_WIDTH-1:0] rating;
 
 assign game1_state = {game_win, game_lose};
@@ -117,12 +119,12 @@ game_engine # (
 graphic # (
     .SCREEN_WIDTH       (SCREEN_WIDTH / 2),
     .SCREEN_HEIGHT      (SCREEN_HEIGHT),
-    .BALL_RADIUS        (BALL_RADIUS),
-
-    .BALL_COLOR         (12'hF00),  // Red
-    .SAFE_COLOR         (12'h0F0),  // Green
-    .BKG_COLOR          (12'h00F)   // Blue
+    .BALL_RADIUS        (BALL_RADIUS)
 ) graphic_inst (
+    .i_ball_color       (ball_color),
+    .i_safe_color       (safe_color),
+    .i_bkg_color        (bkg_color),
+
     .o_screen_x         (screen_x[8:0]),
     .o_screen_y         (screen_y),
 
@@ -182,12 +184,12 @@ second_game_graphics # (
     .SECOND_GAME_START_Y        (0),
     .SECOND_GAME_SCREEN_WIDTH   (SCREEN_WIDTH / 2),
     .SECOND_GAME_SCREEN_HEIGHT  (SCREEN_HEIGHT),
-    .SECOND_GAME_PLAYER_SIZE    (20),
-
-    .SECOND_GAME_PLAYER_COLOR   (12'hF00),  // Red
-    .SECOND_GAME_OBSTACLE_COLOR (12'h0F0),  // Green
-    .SECOND_GAME_BKG_COLOR      (12'h00F)   // Blue
+    .SECOND_GAME_PLAYER_SIZE    (20)
 ) second_game_graphics_inst (
+    .i_player_color             (ball_color),
+    .i_obstacle_color           (safe_color),
+    .i_bkg_color                (bkg_color),
+
     .o_screen_x                 (game2_screen_x),
     .o_screen_y                 (game2_screen_y),
 
@@ -230,5 +232,13 @@ always_comb begin
         {monitor_r, monitor_g, monitor_b} = {game2_r, game2_g, game2_b};
     end
 end
+
+color_palette color_palette_inst (
+    .color_id   (switches[8:1]),
+
+    .color1     (ball_color),
+    .color2     (safe_color),
+    .color3     (bkg_color)
+);
 
 endmodule
