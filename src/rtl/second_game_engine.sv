@@ -122,25 +122,25 @@ always_ff @(posedge clk or negedge arst_n) begin
 
             for (i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
                 if ( 12'(signed'(ball_y - SQUARE_RADIUS)) >= fucking_shit_left_y[i] && 12'(signed'(ball_y - SQUARE_RADIUS)) <= fucking_shit_left_y [i] + SECOND_GAME_SQUARE_SIZE &&
-                    !(9'(ball_x - SQUARE_RADIUS) >= fucking_shit_left_x[i] &&  9'(ball_x - SQUARE_RADIUS) <= fucking_shit_right_x[i])) begin
+                    !(9'(ball_x - 9'(SQUARE_RADIUS)) >= fucking_shit_left_x[i] &&  9'(ball_x - 9'(SQUARE_RADIUS)) <= fucking_shit_right_x[i])) begin
                     is_loss <= 1;
                     $display("is_loss: %d", is_loss);
                     break;
                 end
                 if ( 12'(signed'(ball_y + SQUARE_RADIUS)) >= fucking_shit_left_y[i] && 12'(signed'(ball_y + SQUARE_RADIUS)) <= fucking_shit_left_y [i] + SECOND_GAME_SQUARE_SIZE &&
-                    !(9'(ball_x + SQUARE_RADIUS) >= fucking_shit_left_x[i] &&  9'(ball_x + SQUARE_RADIUS) <= fucking_shit_right_x[i])) begin
+                    !(9'(ball_x + 9'(SQUARE_RADIUS)) >= fucking_shit_left_x[i] &&  9'(ball_x + 9'(SQUARE_RADIUS)) <= fucking_shit_right_x[i])) begin
                     is_loss <= 1;
                     $display("is_loss: %d", is_loss);
                     break;
                 end
                 if ( 12'(signed'(ball_y - SQUARE_RADIUS)) >= fucking_shit_left_y[i] && 12'(signed'(ball_y - SQUARE_RADIUS)) <= fucking_shit_left_y [i] + SECOND_GAME_SQUARE_SIZE &&
-                    !(9'(ball_x + SQUARE_RADIUS) >= fucking_shit_left_x[i] &&  9'(ball_x + SQUARE_RADIUS) <= fucking_shit_right_x[i])) begin
+                    !(9'(ball_x + 9'(SQUARE_RADIUS)) >= fucking_shit_left_x[i] &&  9'(ball_x + 9'(SQUARE_RADIUS)) <= fucking_shit_right_x[i])) begin
                     is_loss <= 1;
                     $display("is_loss: %d", is_loss);
                     break;
                 end
                 if ( 12'(signed'(ball_y + SQUARE_RADIUS)) >= fucking_shit_left_y[i] && 12'(signed'(ball_y + SQUARE_RADIUS)) <= fucking_shit_left_y [i] + SECOND_GAME_SQUARE_SIZE &&
-                    !(9'(ball_x - SQUARE_RADIUS) >= fucking_shit_left_x[i] &&  9'(ball_x - SQUARE_RADIUS) <= fucking_shit_right_x[i])) begin
+                    !(9'(ball_x - 9'(SQUARE_RADIUS)) >= fucking_shit_left_x[i] &&  9'(ball_x - 9'(SQUARE_RADIUS)) <= fucking_shit_right_x[i])) begin
                     is_loss <= 1;
                     $display("is_loss: %d", is_loss);
                     break;
