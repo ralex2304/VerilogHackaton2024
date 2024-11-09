@@ -51,19 +51,20 @@ assign full_banner_pixel_coord = 13'(screen_x) - 13'(SCREEN_WIDTH/2 - 50) +
 assign half_screen_banner_pixel_coord = 13'(screen_x) - 13'(SCREEN_WIDTH/4 - 50) +
                                         13'((13'(screen_y) - 13'(SCREEN_HEIGHT/2 - 25))*(13'd100));
 
-logic [2:0][3:0] init_banner_rom_resp;
+logic [2:0][3:0] init_banner_rom_resp, game_over_banner_rom_resp, pause_banner_rom_resp;
 
 always_comb begin
     if ((SCREEN_WIDTH/2  - 50 <= screen_x && screen_x < SCREEN_WIDTH/2  + 50) &&
         (SCREEN_HEIGHT/2 - 25 <= screen_y && screen_y < SCREEN_HEIGHT/2 + 25)) begin
-        init_banner_pixel = init_banner_rom_resp;
+        init_banner_pixel      = init_banner_rom_resp;
+        game_over_banner_pixel = game_over_banner_rom_resp;
+        pause_banner_pixel     = pause_banner_rom_resp;
     end else begin
-        init_banner_pixel = '0;
+        init_banner_pixel      = '0;
+        game_over_banner_pixel = '0;
+        pause_banner_pixel     = '0;
     end
 end
-
-assign pause_banner_pixel     = init_banner_pixel;
-assign game_over_banner_pixel = init_banner_pixel;
 
 always_comb begin
     if ((SCREEN_WIDTH/4  - 50 <= screen_x && screen_x < SCREEN_WIDTH/4  + 50) &&
@@ -78,17 +79,40 @@ end
 
 `ifdef VIVADO
 
-init_banner_rom_gen init_banner_rom_inst (
+init_banner_mem_gen init_banner_rom_inst (
     .a(banner_pixel_coord),     // input wire [12 : 0] a
     .spo(init_banner_rom_resp)  // output wire [11 : 0] spo
 );
 
+game_over_banner_mem_gen game_over_banner_rom_inst (
+    .a(banner_pixel_coord),         // input wire [12 : 0] a
+    .spo(game_over_banner_rom_resp) // output wire [11 : 0] spo
+);
+
+pause_banner_mem_gen pause_banner_rom_inst (
+    .a(banner_pixel_coord),     // input wire [12 : 0] a
+    .spo(pause_banner_rom_resp) // output wire [11 : 0] spo
+);
+
 `else
 
-init_banner_rom init_banner_rom_inst (
-    .addr(banner_pixel_coord),
-    .word(init_banner_rom_resp)
-);
+logic [11:0] init_image [100*50];
+
+initial $readmemh("../../figures/spirt.txt", init_image);
+
+assign init_banner_rom_resp = init_image[banner_pixel_coord];
+
+logic [11:0] game_over_image [100*50];
+
+initial $readmemh("../../figures/over.txt", game_over_image);
+
+assign game_over_banner_rom_resp = game_over_image[banner_pixel_coord];
+
+logic [11:0] pause_image [100*50];
+
+initial $readmemh("../../figures/pause.txt", pause_image);
+
+assign pause_banner_rom_resp = pause_image[banner_pixel_coord];
 
 `endif
 

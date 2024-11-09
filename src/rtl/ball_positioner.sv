@@ -40,7 +40,7 @@ always_comb begin
         velocity_frac_x_next = 0;
     end else begin
         velocity_x_next = velocity_x;
-        velocity_frac_x_next = velocity_frac_x + {17'b0, signed'(i_accel_x)};
+        velocity_frac_x_next = velocity_frac_x + 24'(signed'(i_accel_x));
     end
 
     if (velocity_frac_y > MAX_FRAC_VEL) begin
@@ -51,7 +51,7 @@ always_comb begin
         velocity_frac_y_next = 0;
     end else begin
         velocity_y_next = velocity_y;
-        velocity_frac_y_next = velocity_frac_y + {17'b0, signed'(i_accel_y)};
+        velocity_frac_y_next = velocity_frac_y + 24'(signed'(i_accel_y));
     end
 
     ball_pos_x_next = ball_pos_x + velocity_x;

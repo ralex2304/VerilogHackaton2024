@@ -23,7 +23,7 @@ always @ (posedge clk or negedge rst_n) begin
     end else if (i_reset_timer) begin
         timer     <= '0;
     end else begin
-        clk_timer <= clk_timer + (i_pause ? 0 : 1);
+        clk_timer <= clk_timer + (i_pause ? '0 : CLK_TIMER_WIDTH'(1'b1));
         if (clk_timer == CLK_FREQ && !i_pause) begin
             timer <= timer + 1;
             $display("1 second");

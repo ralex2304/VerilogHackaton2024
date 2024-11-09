@@ -125,8 +125,8 @@ assign o_is_safe = mem_resp[mem_addr_req % 10];
 
 `ifdef VIVADO
 
-safe_zone_2400_mem_gen safe_zone_mem (
-  .a(mem_addr / 10),  // input wire [7 : 0] a
+safe_zone_mem_gen safe_zone_mem (
+  .a(mem_addr / 10),  // input wire [5 : 0] a
   .d(subarray[suby]), // input wire [9 : 0] d
   .clk(clk),          // input wire clk
   .we(~o_rdy),        // input wire we
