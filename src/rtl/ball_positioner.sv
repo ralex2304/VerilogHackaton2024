@@ -6,24 +6,28 @@ module ball_positioner # (
     input  logic          clk,
     input  logic          arst_n,
 
+    input  logic          i_reset_position,
+
     input  logic    [7:0] i_accel_x,
     input  logic    [7:0] i_accel_y,
 
     output logic    [8:0] o_ball_x,
-    output logic    [9:0] o_ball_y
+    output logic    [9:0] o_ball_y,
+
+    input  logic          i_pause
 );
 
 localparam START_POS_X = SCREEN_WIDTH  / 2;
 localparam START_POS_Y = SCREEN_HEIGHT / 2;
 
-localparam MAX_FRAC_VEL = 2**14;
+localparam MAX_FRAC_VEL = 2**10;
 
 logic signed [10:0] ball_pos_x, ball_pos_x_next,
                     ball_pos_y, ball_pos_y_next;
 logic signed [10:0] velocity_x, velocity_x_next,
                     velocity_y, velocity_y_next;
-logic signed [24:0]  velocity_frac_x, velocity_frac_x_next, 
-                     velocity_frac_y, velocity_frac_y_next;
+logic signed [24:0] velocity_frac_x, velocity_frac_x_next,
+                    velocity_frac_y, velocity_frac_y_next;
 
 logic [19:0] timer;
 
@@ -54,10 +58,10 @@ always_comb begin
     ball_pos_y_next = ball_pos_y + velocity_y;
 
     if (ball_pos_x < BALL_RADIUS && velocity_x < 0) begin
-        ball_pos_x_next = BALL_RADIUS;
+        ball_pos_x_next = 11'(BALL_RADIUS);
         velocity_x_next = -(velocity_x >> 2);
-    end else if (ball_pos_x > SCREEN_WIDTH - BALL_RADIUS && velocity_x > 0) begin
-        ball_pos_x_next = SCREEN_WIDTH - BALL_RADIUS;
+    end else if (ball_pos_x > 11'(SCREEN_WIDTH - BALL_RADIUS) && velocity_x > 0) begin
+        ball_pos_x_next = 11'(SCREEN_WIDTH - BALL_RADIUS);
         velocity_x_next = -(velocity_x >> 2);
     end
 
@@ -71,32 +75,27 @@ always_comb begin
 end
 
 always_ff @(posedge clk or negedge arst_n) begin
-    if (!arst_n) begin
-        ball_pos_x <= START_POS_X;
-        ball_pos_y <= START_POS_Y;
+    if (!arst_n || i_reset_position) begin
+        ball_pos_x <= 11'(START_POS_X);
+        ball_pos_y <= 11'(START_POS_Y);
         velocity_x <= 0;
         velocity_y <= 0;
         velocity_frac_x <= 0;
         velocity_frac_y <= 0;
-        timer <= 0;
-    end else if (timer == 0) begin
+    end else if (timer == 0 && !i_pause) begin
         velocity_x <= velocity_x_next;
         velocity_y <= velocity_y_next;
         ball_pos_x <= ball_pos_x_next;
         ball_pos_y <= ball_pos_y_next;
         velocity_frac_x <= velocity_frac_x_next;
         velocity_frac_y <= velocity_frac_y_next;
-
-        $display("accell_x        = %d", signed'(i_accel_x));
-        $display("velocity_x      = %d", signed'(velocity_x));
-        $display("velocity_frac_x = %d", signed'(velocity_frac_x));
     end
 end
 
 always_ff @(posedge clk or negedge arst_n) begin
     if (!arst_n) begin
         timer <= '0;
-    end else begin
+    end else if (!i_pause) begin
         timer <= timer + 1;
     end
 end

@@ -32,8 +32,9 @@ module game_console (
 localparam SCREEN_WIDTH  = 800;
 localparam SCREEN_HEIGHT = 600;
 localparam BALL_RADIUS   = 10;
-localparam BLOCK_SIZE    = 10;
+localparam BLOCK_SIZE    = 20;
 localparam NUM_IMAGES    = 4;
+localparam RATING_WIDTH  = 8;
 
 logic [$clog2(SCREEN_WIDTH/2)-1:0] screen_ball_x;
 logic  [$clog2(SCREEN_HEIGHT)-1:0] screen_ball_y;
@@ -41,18 +42,51 @@ logic                              ball_is_safe;
 logic [$clog2(SCREEN_WIDTH/2)-1:0] screen_x, game2_screen_x;
 logic  [$clog2(SCREEN_HEIGHT)-1:0] screen_y, game2_screen_y;
 logic                              show_banner;
+logic                              game_running;
 logic     [$clog2(NUM_IMAGES)-1:0] banner_num;
+logic                              regen_level;
+logic                              safe_zone_rdy;
+
+logic game_win, game2_win;
+logic game_lose, game2_lose;
 
 logic [3:0] banner_r, game_r, game2_r;
 logic [3:0] banner_g, game_g, game2_g;
 logic [3:0] banner_b, game_b, game2_b;
+
+logic [RATING_WIDTH-1:0] rating;
+
+game_status # (
+    .RATING_WIDTH (RATING_WIDTH),
+    .NUM_IMAGES   (NUM_IMAGES)
+) game_status_inst (
+    .clk                (clk),
+    .rst_n              (arst_n),
+
+    .i_is_win           (game_win),
+    .i_is_lose          (game_lose || game2_lose),
+    .i_ready            (safe_zone_rdy),
+    .o_regenerate_level (regen_level),
+
+    // button
+    .i_pause_game       (button_l),
+    .i_start_game       (button_r),
+
+    .o_current_rating   (rating),
+    .o_game_running     (game_running),
+    .o_image_number     (banner_num)
+);
+
+assign show_banner    = ~game_running;
+assign quad_disp[7:0] = rating;
 
 game_engine # (
     .SCREEN_WIDTH  (SCREEN_WIDTH / 2),
     .SCREEN_HEIGHT (SCREEN_HEIGHT),
     .BALL_RADIUS   (BALL_RADIUS),
     .BLOCK_SIZE    (BLOCK_SIZE),
-    .NUM_IMAGES    (NUM_IMAGES)
+    .NUM_IMAGES    (NUM_IMAGES),
+    .RATING_WIDTH  (RATING_WIDTH)
 ) engine (
     .clk                (clk),
     .arst_n             (arst_n),
@@ -62,22 +96,21 @@ game_engine # (
     .i_accel_dy         (accel_data_y),
     // Switches
     .i_switches         (switches),
-    // Buttons
-    .i_btn_center       (button_c),
-    .i_btn_left         (button_l),
-    .i_btn_right        (button_r),
-    .i_btn_up           (button_u),
-    .i_btn_down         (button_d),
     // Graphic
     .i_screen_x         (screen_x),
     .i_screen_y         (screen_y),
     .o_screen_ball_x    (screen_ball_x),
     .o_screen_ball_y    (screen_ball_y),
     .o_is_safe          (ball_is_safe),
-    .o_show_banner      (show_banner),
-    .o_banner_num       (banner_num),
+    // State
+    .i_pause            (~game_running),
+    .i_regenerate_level (regen_level),
+    .o_safe_zone_rdy    (safe_zone_rdy),
+    .o_win              (game_win),
+    .o_lose             (game_lose),
+    .i_rating           (rating),
     // Quad display
-    .o_disp_data        (quad_disp)
+    .o_timer            (quad_disp[31:16])
 );
 
 graphic # (

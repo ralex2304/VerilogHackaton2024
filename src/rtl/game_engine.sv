@@ -3,7 +3,8 @@ module game_engine # (
     parameter SCREEN_HEIGHT = 600,
     parameter BALL_RADIUS   = 10,
     parameter BLOCK_SIZE    = 10,
-    parameter NUM_IMAGES    = 4
+    parameter NUM_IMAGES    = 4,
+    parameter RATING_WIDTH  = 8
 )(
     input  logic                             clk,
     input  logic                             arst_n,
@@ -13,27 +14,24 @@ module game_engine # (
     input  logic                       [7:0] i_accel_dy,
     // Switches
     input  logic                      [15:0] i_switches,
-    // Buttons
-    input  logic                             i_btn_center,
-    input  logic                             i_btn_left,
-    input  logic                             i_btn_right,
-    input  logic                             i_btn_up,
-    input  logic                             i_btn_down,
     // Graphic
     input  logic  [$clog2(SCREEN_WIDTH)-1:0] i_screen_x,
     input  logic [$clog2(SCREEN_HEIGHT)-1:0] i_screen_y,
     output logic  [$clog2(SCREEN_WIDTH)-1:0] o_screen_ball_x,
     output logic [$clog2(SCREEN_HEIGHT)-1:0] o_screen_ball_y,
     output logic                             o_is_safe,
-    output logic                             o_show_banner,
-    output logic    [$clog2(NUM_IMAGES)-1:0] o_banner_num,
+    // State
+    input  logic                             i_pause,
+    input  logic                             i_regenerate_level,
+    output logic                             o_safe_zone_rdy,
+    output logic                             o_win,
+    output logic                             o_lose,
+    input  logic          [RATING_WIDTH-1:0] i_rating,
     // Quad display
-    output logic                      [31:0] o_disp_data
+    output logic                      [15:0] o_timer
 );
 
-logic regenerate_level;
-logic safe_zone_rdy;
-logic game_running;
+logic round_ending;
 
 safe_zone # (
     .SCREEN_WIDTH  (SCREEN_WIDTH),
@@ -43,11 +41,11 @@ safe_zone # (
     .clk                (clk),
     .arst_n             (arst_n),
 
-    .i_regenerate_level (regenerate_level),
-    .o_rdy              (safe_zone_rdy),
+    .i_regenerate_level (i_regenerate_level),
+    .o_rdy              (o_safe_zone_rdy),
 
-    .i_x                (i_screen_x),
-    .i_y                (i_screen_y),
+    .i_x                (round_ending ? o_screen_ball_x : i_screen_x),
+    .i_y                (round_ending ? o_screen_ball_y : i_screen_y),
     .o_is_safe          (o_is_safe)
 );
 
@@ -56,38 +54,55 @@ ball_positioner # (
     .SCREEN_HEIGHT (SCREEN_HEIGHT),
     .BALL_RADIUS   (BALL_RADIUS)
 ) ball_positioner_inst (
-    .clk        (clk),
-    .arst_n     (arst_n),
+    .clk              (clk),
+    .arst_n           (arst_n),
 
-    .i_accel_x  (i_accel_dx),
-    .i_accel_y  (i_accel_dy),
+    .i_reset_position (i_regenerate_level),
 
-    .o_ball_x   (o_screen_ball_x),
-    .o_ball_y   (o_screen_ball_y)
+    .i_accel_x        (i_accel_dx),
+    .i_accel_y        (i_accel_dy),
+
+    .o_ball_x         (o_screen_ball_x),
+    .o_ball_y         (o_screen_ball_y),
+
+    .i_pause          (i_pause)
 );
 
-game_status # (
-    .RATING_WIDTH (8),
-    .NUM_IMAGES   (NUM_IMAGES)
-) game_status_inst (
-    .clk                (clk),
-    .rst_n              (arst_n),
+logic [15:0] timer, lvl_begin, wait_time;
 
-    // safe zone
-    .i_is_win           (),           // is round win or lose
-    .i_round_ended      (),      // is round ended
-    .i_ready            (safe_zone_rdy),            // is safe zone end generation
-    .o_regenerate_level (regenerate_level),
+timer # (
+    .TIMER_WIDTH (16),
+    .CLK_FREQ    (36_000_00) // FIXME fix timer
+) timer_inst (
+    .clk            (clk),
+    .rst_n          (arst_n),
 
-    // button
-    .i_pause_game       (i_btn_left),
-    .i_start_game       (i_btn_right),
+    .i_pause        (i_pause),
+    .i_reset_timer  (i_regenerate_level),
 
-    .o_current_rating   (o_disp_data[7:0]),
-    .o_game_running     (game_running),
-    .o_image_number     (o_banner_num)
+    .o_current_time (timer)
 );
 
-assign o_show_banner = ~game_running;
+always_ff @(posedge clk or negedge arst_n) begin
+    if (~arst_n) begin
+        lvl_begin <= '0;
+        wait_time <= '0;
+    end else if (i_regenerate_level) begin
+        lvl_begin <= timer;
+        wait_time <= (i_rating <= 8) ? (16'd10 - 16'(i_rating)) : 2;
+    end
+end
+
+assign round_ending = (timer - lvl_begin > wait_time) && !i_pause;
+
+always_comb begin
+    o_win  = 1'b0;
+    o_lose = 1'b0;
+    if (round_ending && o_is_safe) begin
+        o_win  = 1'b1;
+    end else if (round_ending) begin
+        o_lose = 1'b1;
+    end
+end
 
 endmodule

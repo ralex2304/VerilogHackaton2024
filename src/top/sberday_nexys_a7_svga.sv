@@ -29,6 +29,9 @@ module sberday_nexys_a7_svga (
     output  logic            VGA_HS    ,
     output  logic            VGA_VS
 );
+
+
+
 //------------- Signals declaration                              -------------//
   //----------- Clocks                                           -----------//
     wire          pixel_clk    ;     // 36 MHz, phase 0 degrees
@@ -38,7 +41,8 @@ module sberday_nexys_a7_svga (
     wire          pll_rst_n    ;
     wire          rst_n        ;
   //----------- VGA Controller                                   -----------//
-    wire [31:0]   h_coord, v_coord;         // Pixcels Coordinates
+    wire [10:0]   h_coord;
+    wire [9:0]    v_coord;         // Pixcels Coordinates
     wire [3:0]    red, green, blue; // Pixcels Colors
     // Timing signals - don't touch these:
     wire          h_sync, v_sync;     // Horizontal & Vertical synchronization
@@ -48,7 +52,7 @@ module sberday_nexys_a7_svga (
     logic         button_u, button_u_d, button_u_u;
     logic         button_d, button_d_d, button_d_u;
     logic         button_l, button_l_d, button_l_u;
-    logic         button_r, button_l_r, button_r_u;
+    logic         button_r, button_r_d, button_r_u;
   //----------- Seven Segments Indicators                        -----------//
     wire  [31:0]  sevseg_32bit_hex_val;
   //----------- Accelerometor                                    -----------//
@@ -146,7 +150,7 @@ module sberday_nexys_a7_svga (
       .don_active_n           ( DP                           ),
       .anodes                 ( AN                           )
     );
-    assign sevseg_32bit_hex_val = {8'b0, accel_x_end_of_frame, 8'b0, accel_y_end_of_frame}; //32'hDEADBEEF;
+    //assign sevseg_32bit_hex_val = {8'b0, accel_x_end_of_frame, 8'b0, accel_y_end_of_frame}; //32'hDEADBEEF; // REVIEW
   //----------- Accelerometer                                    -----------//
     accelerometr_ctrl accelerometr_ctrl (
       //Clocks & Resets
@@ -163,7 +167,7 @@ module sberday_nexys_a7_svga (
         .ACL_MOSI           ( ACL_MOSI      )
     );
 //____________________________________________________________________________//
-
+/*
 //------------- Demo module                                      -------------//
   game game_demo (
     //--------------------- Clock & Reset                ----------------------------//
@@ -181,8 +185,8 @@ module sberday_nexys_a7_svga (
       .button_r               ( button_r           ),
       .button_l               ( button_l           ),
     //--------------------- Pixcels Coordinates          ----------------------------//
-      .h_coord                ( h_coord[10:0]      ),  // only bottom 11 bits needed to count to 800
-      .v_coord                ( v_coord[ 9:0]      ),  // only bottom 10 bits needed to count to 600
+      .h_coord                ( h_coord            ),  // only bottom 11 bits needed to count to 800
+      .v_coord                ( v_coord            ),  // only bottom 10 bits needed to count to 600
     //--------------------- VGA outputs from demo        ----------------------------//
       .red                    ( red                ),  // 4-bit color output
       .green                  ( green              ),  // 4-bit color output
@@ -193,6 +197,38 @@ module sberday_nexys_a7_svga (
       .demo_regime_status     ( demo_regime_status )   // Red led on the board which show REGIME
   );
 //____________________________________________________________________________//
+*/
+
+game_console game_console_inst (
+    .clk                (pixel_clk),
+    .arst_n             (rst_n),
+
+    // Accel
+    .accel_data_x       (accel_data_x),
+    .accel_data_y       (accel_data_y),
+    // Mouse
+    .mouse_x            (), // TODO
+    .is_mouse_x_neg     (),
+    .mouse_y            (),
+    .is_mouse_y_neg     (),
+    // Switches
+    .switches           (SW),
+    // Buttons
+    .button_c           (button_c),
+    .button_u           (button_u),
+    .button_d           (button_d),
+    .button_r           (button_r),
+    .button_l           (button_l),
+    // Monitor
+    .monitor_h_coord    (h_coord),
+    .monitor_v_coord    (v_coord),
+    .monitor_enable     (disp_enbl),
+    .monitor_r          (red),
+    .monitor_g          (green),
+    .monitor_b          (blue),
+    // Quad display
+    .quad_disp          (sevseg_32bit_hex_val)
+);
 
 //------------- VGA controller                                   -------------//
     display_ctrl display_ctrl (

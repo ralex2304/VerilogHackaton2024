@@ -1,7 +1,7 @@
 module safe_zone # (
     parameter SCREEN_WIDTH  = 400,
     parameter SCREEN_HEIGHT = 600,
-    parameter BLOCK_SIZE    = 10
+    parameter BLOCK_SIZE    = 20
 )(
     input  logic                             clk,
     input  logic                             arst_n,
@@ -29,8 +29,9 @@ logic [SUB_SIZE-1:0][SUB_SIZE-1:0] subarray;
 logic [$clog2(SUB_SIZE)-1:0] subx, suby;
 
 assign gen_finished    = (x == ($clog2(SUBARRAYS_X_NUM))'(SUBARRAYS_X_NUM - 1) &&
-                          y == ($clog2(SUBARRAYS_Y_NUM))'(SUBARRAYS_Y_NUM - 1));
-assign subgen_finished = (subx == SUB_SIZE && suby == SUB_SIZE);
+                          y == ($clog2(SUBARRAYS_Y_NUM))'(SUBARRAYS_Y_NUM - 1)) &&
+                         subgen_finished;
+assign subgen_finished = (subx == SUB_SIZE - 1 && suby == SUB_SIZE - 1);
 
 assign o_rdy = ~gen;
 
@@ -62,13 +63,13 @@ always_ff @(posedge clk) begin
         subgen <= 1'b1;
         subx   <= '0;
         suby   <= '0;
-    end else if (subgen && subx == SUB_SIZE && suby == SUB_SIZE) begin
+    end else if (subgen && subgen_finished) begin
         subgen <= !gen_finished;
         subx   <= '0;
         suby   <= '0;
     end else begin
-        suby   <= suby + 4'(subx == SUB_SIZE);
-        subx   <= (subx == SUB_SIZE) ? 4'b0 : (subx + 1);
+        suby   <= suby + 4'(subx == SUB_SIZE - 1);
+        subx   <= (subx == SUB_SIZE - 1) ? 4'b0 : (subx + 1);
     end
 end
 
@@ -89,13 +90,13 @@ pseudo_random_generator prg_inst (
 
 always_comb begin
     if (upper_exists && left_exists && ludiag_exists)
-        random_res = random < 8'(integer'(2**RAND_WIDTH * 0.25));
+        random_res = random < 8'(integer'(2**RAND_WIDTH * 0.1));
     else if (upper_exists && left_exists)
-        random_res = random < 8'(integer'(2**RAND_WIDTH * 0.75));
+        random_res = random < 8'(integer'(2**RAND_WIDTH * 0.5));
     else if (!upper_exists && !left_exists && !ludiag_exists)
         random_res = random < 8'(integer'(2**RAND_WIDTH * 0.25));
     else
-        random_res = random < 8'(integer'(2**RAND_WIDTH * 0.5));
+        random_res = random < 8'(integer'(2**RAND_WIDTH * 0.3));
 end
 
 always_ff @(posedge clk) begin
@@ -111,8 +112,8 @@ logic [MEMADDR_WIDTH-1:0] mem_addr_gen, mem_addr_req, mem_addr;
 assign mem_addr_gen = (MEMADDR_WIDTH'(x) * SUB_SIZE + MEMADDR_WIDTH'(subx) +
                       (MEMADDR_WIDTH'(y) * SUB_SIZE + MEMADDR_WIDTH'(suby)) * (SCREEN_WIDTH/BLOCK_SIZE));
 
-assign mem_addr_req = (MEMADDR_WIDTH'(i_x) / BLOCK_SIZE +
-                      (MEMADDR_WIDTH'(i_y) / BLOCK_SIZE) * (SCREEN_WIDTH/BLOCK_SIZE));
+assign mem_addr_req = (MEMADDR_WIDTH'(10'(i_x) / 10'(BLOCK_SIZE)) +
+                      (MEMADDR_WIDTH'(i_y / 10'(BLOCK_SIZE))) * (SCREEN_WIDTH/BLOCK_SIZE));
 
 assign mem_addr = o_rdy ? mem_addr_req : mem_addr_gen;
 
@@ -124,8 +125,8 @@ assign o_is_safe = mem_resp[mem_addr_req % 10];
 
 `ifdef VIVADO
 
-safe_zone_4800_mem_gen safe_zone_mem (
-  .a(mem_addr / 10),  // input wire [8 : 0] a
+safe_zone_2400_mem_gen safe_zone_mem (
+  .a(mem_addr / 10),  // input wire [7 : 0] a
   .d(subarray[suby]), // input wire [9 : 0] d
   .clk(clk),          // input wire clk
   .we(~o_rdy),        // input wire we
@@ -134,7 +135,7 @@ safe_zone_4800_mem_gen safe_zone_mem (
 
 `else // NON VIVADO SIM
 
-logic [9:0] mem_data [480];
+logic [9:0] mem_data [60];
 
 assign mem_resp = mem_data[mem_addr / 10];
 

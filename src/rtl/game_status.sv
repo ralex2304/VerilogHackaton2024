@@ -10,9 +10,9 @@ module game_status # (
     input  logic                                rst_n,
 
     // safe zone
-    input  logic                                i_is_win,           // is round win or lose
-    input  logic                                i_round_ended,      // is round ended
-    input  logic                                i_ready,            // is safe zone end generation
+    input  logic                                i_is_win,
+    input  logic                                i_is_lose,
+    input  logic                                i_ready,
     output logic                                o_regenerate_level,
 
     // button
@@ -26,13 +26,14 @@ module game_status # (
 
 logic [RATING_WIDTH-1:0] rating_count;
 
+logic reset_rating;
+
 always @ (posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
+    if (!rst_n || reset_rating) begin
         rating_count <= 0;
     end else begin
-        if (i_round_ended)
-            rating_count <= i_is_win ? rating_count + 1
-                                     : '0;
+        if (i_is_lose || i_is_win)
+            rating_count <= i_is_win ? rating_count + 1 : '0;
     end
 end
 
@@ -54,7 +55,7 @@ always_comb begin
     case (gstate)
         INITIAL:            gstate_next = i_start_game ? LEVEL_GENERATING : INITIAL;
         LEVEL_GENERATING:   gstate_next = i_ready ? LEVEL_RUNNING : LEVEL_GENERATING;
-        LEVEL_RUNNING:      if (i_round_ended) begin
+        LEVEL_RUNNING:      if (i_is_lose || i_is_win) begin
                                 gstate_next = i_is_win ? LEVEL_GENERATING : GAME_OVER;
                             end else begin
                                 gstate_next = i_pause_game ? LEVEL_PAUSED : LEVEL_RUNNING;
@@ -67,7 +68,7 @@ end
 
 always @ (posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-        gstate <= LEVEL_GENERATING;
+        gstate <= INITIAL;
     end else begin
         gstate <= gstate_next;
     end
@@ -75,6 +76,7 @@ end
 
 assign o_game_running     = (gstate == LEVEL_RUNNING);
 assign o_regenerate_level = (gstate != LEVEL_GENERATING) && (gstate_next == LEVEL_GENERATING);
+assign reset_rating       = (gstate == GAME_OVER) && (gstate_next != GAME_OVER);
 
 always_comb begin
     case (gstate)

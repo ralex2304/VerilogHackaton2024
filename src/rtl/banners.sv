@@ -25,16 +25,16 @@ always_comb begin
         o_green = 4'b0000;
         o_blue  = 4'b0000;
     end else if (i_banner_num == 2'b00) begin // initial
-        {o_red, o_green, o_blue} = init_banner_pixel;
+        {o_blue, o_green, o_red} = init_banner_pixel;
     end else if (i_banner_num == 2'b01) begin // pause
-        {o_red, o_green, o_blue} = pause_banner_pixel;
+        {o_blue, o_green, o_red} = pause_banner_pixel;
     end else if (i_banner_num == 2'b10) begin // game over
-        {o_red, o_green, o_blue} = game_over_banner_pixel;
+        {o_blue, o_green, o_red} = game_over_banner_pixel;
     end else if (i_banner_num == 2'b11 && screen_x < SCREEN_WIDTH/2) begin // regenerating level
         banner_pixel_coord = half_screen_banner_pixel_coord;
-        {o_red, o_green, o_blue} = lvl_regen_banner_pixel;
+        {o_blue, o_green, o_red} = lvl_regen_banner_pixel;
     end else begin
-        {o_red, o_green, o_blue} = '0;
+        {o_blue, o_green, o_red} = '0;
     end
 end
 
@@ -52,19 +52,6 @@ assign half_screen_banner_pixel_coord = 13'(screen_x) - 13'(SCREEN_WIDTH/4 - 50)
                                         13'((13'(screen_y) - 13'(SCREEN_HEIGHT/2 - 25))*(13'd100));
 
 logic [2:0][3:0] init_banner_rom_resp;
-
-//`define VIVADO
-
-`ifdef VIVADO
-
-// TODO
-
-`else
-
-init_banner_rom init_banner_rom_inst (
-    .addr(banner_pixel_coord),
-    .word(init_banner_rom_resp)
-);
 
 always_comb begin
     if ((SCREEN_WIDTH/2  - 50 <= screen_x && screen_x < SCREEN_WIDTH/2  + 50) &&
@@ -86,6 +73,22 @@ always_comb begin
         lvl_regen_banner_pixel = '0;
     end
 end
+
+//`define VIVADO
+
+`ifdef VIVADO
+
+init_banner_rom_gen init_banner_rom_inst (
+    .a(banner_pixel_coord),     // input wire [12 : 0] a
+    .spo(init_banner_rom_resp)  // output wire [11 : 0] spo
+);
+
+`else
+
+init_banner_rom init_banner_rom_inst (
+    .addr(banner_pixel_coord),
+    .word(init_banner_rom_resp)
+);
 
 `endif
 
