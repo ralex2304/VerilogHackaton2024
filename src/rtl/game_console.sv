@@ -173,7 +173,7 @@ second_game_engine #(
 
     .o_ball_x                           (game2_ball_x),
     .o_ball_y                           (game2_ball_y),
-    .o_is_lose                          (game_lose)
+    .o_is_lose                          (game2_lose)
 );
 
 second_game_graphics # (
