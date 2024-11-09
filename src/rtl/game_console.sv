@@ -162,10 +162,10 @@ second_game_engine #(
     .clk                                (clk),
     .arst_n                             (arst_n),
 
-    .i_button_l                         (button_l),
-    .i_button_r                         (button_r),
-    .i_button_u                         (button_u),
-    .i_button_d                         (button_d),
+    .i_button_l                         (button_u),
+    .i_button_r                         (button_d),
+    .i_button_u                         (button_l),
+    .i_button_d                         (button_r),
 
     .i_screen_x                         (game2_screen_x),
     .i_screen_y                         (game2_screen_y),

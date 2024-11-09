@@ -27,10 +27,7 @@ module sberday_nexys_a7_svga (
     output  logic  [ 3:0]    VGA_G     ,
     output  logic  [ 3:0]    VGA_B     ,
     output  logic            VGA_HS    ,
-    output  logic            VGA_VS    ,
-  //----------- PS/2
-    input   logic            PS2_CLK   ,
-    input   logic            PS2_DATA
+    output  logic            VGA_VS
 );
 
 

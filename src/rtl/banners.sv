@@ -75,7 +75,7 @@ always_comb begin
     end
 end
 
-//`define VIVADO
+`define VIVADO
 
 `ifdef VIVADO
 

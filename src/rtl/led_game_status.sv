@@ -18,12 +18,7 @@ localparam [2:0] BLUE  = 3'b001;
 
 always @ (posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-        case (game1_state)
-            2'b00: led16 <= 0;
-            2'b01: led16 <= 0;
-            2'b10: led16 <= 0;
-            2'b11: led16 <= 0;
-        endcase
+        led16 <= 0;
     end else begin
         case (game1_state)
             2'b00: led16 <= BLUE;       // paused
@@ -36,12 +31,7 @@ end
 
 always @ (posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-        case (game1_state)
-            2'b00: led17 <= 0;
-            2'b01: led17 <= 0;
-            2'b10: led17 <= 0;
-            2'b11: led17 <= 0;
-        endcase
+        led17 <= 0;
     end else begin
         case (game1_state)
             2'b00: led17 <= BLUE;       // paused

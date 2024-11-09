@@ -121,7 +121,7 @@ logic [9:0] mem_resp;
 
 assign o_is_safe = mem_resp[mem_addr_req % 10];
 
-//`define VIVADO
+`define VIVADO
 
 `ifdef VIVADO
 
