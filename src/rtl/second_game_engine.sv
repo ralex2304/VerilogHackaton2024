@@ -51,7 +51,7 @@ logic [8:0]  fucking_shit_right_x[SECOND_GAME_NUM_OBSTACLES];
 logic signed [11:0] fucking_shit_right_y[SECOND_GAME_NUM_OBSTACLES];
 
 // NOTE: change timer size to chenge speed
-logic [14:0] timer;
+logic [17:0] timer;
 logic [8:0] ball_x;
 logic [9:0] ball_y;
 
@@ -87,10 +87,14 @@ always_ff @(posedge clk or negedge arst_n) begin
 
     end else if (i_is_pause) begin
 
+    end else if (is_loss) begin
+        for (integer i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
+            fucking_shit_left_y [i] = 12'(signed'(-400 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE)));
+            fucking_shit_right_y[i] = 12'(signed'(-400 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE)));
+            fucking_shit_left_x [i] = 50;
+            fucking_shit_right_x[i] = 350;
+        end
     end else begin
-
-        integer i;
-
         if (hole_size > 40 && hole_smallanator == 0) begin
             hole_size <= hole_size - 1;
             hole_smallanator <= hole_smallanator + 1;
@@ -102,7 +106,7 @@ always_ff @(posedge clk or negedge arst_n) begin
         timer <= timer + 1;
         if (timer == 0) begin
 
-            for (i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
+            for (integer i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
                 if (fucking_shit_left_y[i] > SECOND_GAME_HEIGHT) begin
                     fucking_shit_left_y [i] <= 0;
                     fucking_shit_right_y[i] <= 0;
@@ -120,7 +124,7 @@ always_ff @(posedge clk or negedge arst_n) begin
                 end
             end
 
-            for (i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
+            for (integer i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
                 if ( 12'(signed'(ball_y - SQUARE_RADIUS)) >= fucking_shit_left_y[i] && 12'(signed'(ball_y - SQUARE_RADIUS)) <= fucking_shit_left_y [i] + SECOND_GAME_SQUARE_SIZE &&
                     !(9'(ball_x - 9'(SQUARE_RADIUS)) >= fucking_shit_left_x[i] &&  9'(ball_x - 9'(SQUARE_RADIUS)) <= fucking_shit_right_x[i])) begin
                     is_loss <= 1;
@@ -157,21 +161,7 @@ always_comb begin
     o_ball_x = ball_x;
     o_ball_y = ball_y;
     o_is_lose = is_loss;
-    if (is_loss) begin
-        for (i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
-            fucking_shit_left_y [i] = 12'(signed'(-400 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE)));
-            fucking_shit_right_y[i] = 12'(signed'(-400 + i * (SECOND_GAME_SQUARE_SIZE + SECOND_GAME_BETWEEN_OBSTACLE_SIZE)));
-            fucking_shit_left_x [i] = 50;
-            fucking_shit_right_x[i] = 350;
-        end
-    end else begin
-        for (i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
-            fucking_shit_left_y [i] = fucking_shit_left_y [i];
-            fucking_shit_right_y[i] = fucking_shit_right_y[i];
-            fucking_shit_left_x [i] = fucking_shit_left_x [i];
-            fucking_shit_right_x[i] = fucking_shit_right_x[i];
-        end
-    end
+
     for (i = 0; i < SECOND_GAME_NUM_OBSTACLES; i++) begin
         if (  12'(signed'(i_screen_y)) >= fucking_shit_left_y[i] && 12'(signed'(i_screen_y)) <=  fucking_shit_left_y[i] + SECOND_GAME_SQUARE_SIZE &&
             !( 9'(i_screen_x) >= fucking_shit_left_x[i] &&  9'(i_screen_x) <= fucking_shit_right_x[i])) begin
