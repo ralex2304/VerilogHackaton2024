@@ -35,7 +35,7 @@ logic signed [10:0] v_coord;
 assign screen_square_x = signed'(10'(i_screen_square_x));
 assign screen_square_y = signed'(11'(SECOND_GAME_PLAYER_SIZE / 2));
 
-assign h_coord = 11'(signed'(12'(i_h_coord)) - SECOND_GAME_START_X);
+assign h_coord = 11'(signed'(12'(i_h_coord)) - 12'(SECOND_GAME_START_X));
 assign v_coord = signed'(11'(i_v_coord));
 
 always_comb begin

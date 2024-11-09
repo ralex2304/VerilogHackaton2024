@@ -69,8 +69,8 @@ game_console game_console_inst (
     .arst_n             (~sim_rst),
 
     // Accel
-    .accel_data_x       ('0),// TODO
-    .accel_data_y       ('0),
+    .accel_data_x       (button_u ? 8'hef : '0),// TODO
+    .accel_data_y       (button_d ? 8'hef : '0),
     // Mouse
     .mouse_x            (),
     .is_mouse_x_neg     (),

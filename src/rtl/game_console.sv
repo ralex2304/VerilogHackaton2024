@@ -152,7 +152,7 @@ second_game_engine #(
 
     .SECOND_GAME_PLAYER_SIZE            (30),
     .SECOND_GAME_SQUARE_SIZE            (20),
-    .SECOND_GAME_BETWEEN_OBSTACLE_SIZE  (40),
+    .SECOND_GAME_BETWEEN_OBSTACLE_SIZE  (100),
     .SECOND_GAME_NUM_OBSTACLES          (5)
 ) second_game_engine_inst (
     .clk                                (clk),
